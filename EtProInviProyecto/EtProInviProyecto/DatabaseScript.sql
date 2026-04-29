@@ -1,0 +1,39 @@
+CREATE DATABASE IF NOT EXISTS GestionBienesETProDB;
+USE GestionBienesETProDB;
+
+CREATE TABLE IF NOT EXISTS Users (
+    ID VARCHAR(450) PRIMARY KEY,
+    UserName VARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash TEXT NOT NULL,
+    DepartmentID INT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Permissions (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    Description VARCHAR(255),
+    Category VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS TemplatePermissions (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Description VARCHAR(255),
+    Editable TINYINT(1) NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS TemplatePermissionDetails (
+    TemplateID INT NOT NULL,
+    PermissionID INT NOT NULL,
+    PRIMARY KEY (TemplateID, PermissionID),
+    FOREIGN KEY (TemplateID) REFERENCES TemplatePermissions(Id) ON DELETE CASCADE,
+    FOREIGN KEY (PermissionID) REFERENCES Permissions(ID) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS UserPermission (
+    UserID VARCHAR(450) NOT NULL,
+    PermissionID INT NOT NULL,
+    PRIMARY KEY (UserID, PermissionID),
+    FOREIGN KEY (UserID) REFERENCES Users(ID) ON DELETE CASCADE,
+    FOREIGN KEY (PermissionID) REFERENCES Permissions(ID) ON DELETE CASCADE
+);

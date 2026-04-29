@@ -1,0 +1,105 @@
+# .gitignore para proyecto ASP.NET Core con Visual Studio
+
+## Archivos de Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+## Resultados de compilación
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+
+## Paquetes NuGet
+**/packages/*
+!**/packages/repositories.config
+*.nupkg
+**/NuGet.exe
+
+## Archivos de la base de datos local
+*.mdf
+*.ldf
+*.sdf
+
+
+## Archivos de pruebas
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.testsettings
+
+## Archivos de publicación
+publish/
+*.pubxml
+*.publishproj
+
+## Archivos de configuración de IIS
+*.csdef
+*.csx
+
+## Configuraciones de VS Code (si usas)
+.vscode/
+
+## Archivos de caché de ReSharper
+_ReSharper*/
+*.ReSharper
+*.DotSettings.user
+
+## Archivos de Team Foundation Server
+*.tfsignore
+
+## Archivos de Office temp
+~$*
+
+## Archivos de entorno
+*.env
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+
+## Archivos de la base de datos SQLite
+*.db
+*.sqlite3
+
+## Logs
+*.log
+logs/
+
+## Archivos de respaldo
+*.bak
+*.swp
+*.orig
+
+## Archivos específicos de macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## Icono de Thumbs.db
+Thumbs.db
+desktop.ini
+
+## Archivos de herramientas de compilación
+*.Cache
+*.pidb
+*.pdb
+*.vsp
+*.vspscc
+
+## Archivos generados por Bootstrap/JavaScript
+wwwroot/lib/
+wwwroot/js/
+!wwwroot/js/site.js
+!wwwroot/lib/bootstrap/
+!wwwroot/lib/jquery/
+
+## Archivos de migraciones de EF Core (si no quieres subirlos)
+# Migrations/

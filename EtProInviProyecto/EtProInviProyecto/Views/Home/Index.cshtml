@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Página principal";
+}
+<h1>Bienvenido al Sistema de Gestión de Bienes</h1>
+@if (User.Identity.IsAuthenticated)
+{
+    <p>Hola, @User.Identity.Name.</p>
+}
+else
+{
+    <p>No has iniciado sesión.</p>
+}
