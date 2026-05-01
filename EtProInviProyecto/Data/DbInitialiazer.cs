@@ -4,6 +4,7 @@ using ETPro.Models;
 using ETPro.Services;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace ETPro.Data
 {
     public static class DbInitializer
@@ -113,6 +114,25 @@ namespace ETPro.Data
                         context.UserPermission.Add(new UserPermission { UserID = superuser.ID, PermissionID = permission.ID });
                     }
                     await context.SaveChangesAsync();
+                }
+
+                if (!context.Bienes.Any())
+                {
+                    context.Bienes.Add(new BienMueble
+                    {
+                        NumeroIdentificacion = "BIEN-2025-001",
+                        Nombre = "Laptop HP ProBook 450 G9",
+                        Marca = "HP",
+                        Modelo = "450 G9",
+                        Serial = "SN123456",
+                        Color = "Negro",
+                        Material = "Plástico y metal",
+                        ValorUnitario = 1200.00m,
+                        DependenciaID = 1,
+                        Grupo = 2,
+                        ObservacionesAdicionales = "Asignada al superadmin"
+                    });
+                    context.SaveChanges();
                 }
             }
         }

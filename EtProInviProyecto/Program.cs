@@ -22,8 +22,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
-// ─── Servicios propios ───
-builder.Services.AddScoped<PasswordHashingService>();
+
 
 // ─── Autorización personalizada ───
 builder.Services.AddHttpContextAccessor();
@@ -62,7 +61,6 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
-    var passwordService = services.GetRequiredService<PasswordHashingService>();
     await DbInitializer.InitializeAsync(context);
 }
 

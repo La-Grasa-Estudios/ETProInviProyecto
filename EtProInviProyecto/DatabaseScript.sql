@@ -37,3 +37,18 @@ CREATE TABLE IF NOT EXISTS UserPermission (
     FOREIGN KEY (UserID) REFERENCES Users(ID) ON DELETE CASCADE,
     FOREIGN KEY (PermissionID) REFERENCES Permissions(ID) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS BienesMuebles (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    NumeroIdentificacion VARCHAR(50) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
+    Marca VARCHAR(50) NULL,
+    Modelo VARCHAR(50) NULL,
+    `Serial` VARCHAR(100) NULL,        
+    Color VARCHAR(50) NULL,
+    Material VARCHAR(50) NULL,
+    ObservacionesAdicionales VARCHAR(150) NULL,
+    Grupo INT NOT NULL DEFAULT 2,
+    DependenciaID INT NOT NULL,
+    ValorUnitario DECIMAL(18,2) NOT NULL
+);

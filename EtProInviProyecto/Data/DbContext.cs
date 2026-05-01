@@ -2,12 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using ETPro.Models;
 using EtPro.Models;
+using EtPro.Models;
 
 namespace ETPro.Data
 {
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<BienMueble> Bienes { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<TemplatePermission> TemplatePermissions { get; set; }
         public DbSet<TemplatePermissionDetails> TemplatePermissionDetails { get; set; }
@@ -51,6 +53,14 @@ namespace ETPro.Data
                 .HasOne(pp => pp.PermissionInstance)
                 .WithMany(p => p.TemplatePermissionInfo)
                 .HasForeignKey(pp => pp.PermissionID);
+
+            builder.Entity<BienMueble>(entity =>
+            {
+                entity.ToTable("BienesMuebles");
+                entity.Property(b => b.NumeroIdentificacion).IsRequired().HasMaxLength(50);
+
+            });
+            builder.Entity<BienMueble>().Property(b => b.DependenciaID).HasColumnName("DependenciaID");
         }
     }
 }

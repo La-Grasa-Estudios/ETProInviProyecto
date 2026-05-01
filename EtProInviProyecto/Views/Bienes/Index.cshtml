@@ -1,0 +1,38 @@
+﻿@using EtPro.Models
+@model IEnumerable<BienMueble>
+<h2>Inventario de bienes</h2>
+
+@if (User.HasClaim("Permiso", "Bienes.Crear"))
+{
+    <a asp-action="Create" class="btn btn-primary">Nuevo bien</a>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.NumeroIdentificacion)</th>
+            <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.DependenciaID)</th>
+            <th>@Html.DisplayNameFor(model => model.ValorUnitario)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.NumeroIdentificacion</td>
+                <td>@item.Nombre</td>
+                <td>@item.DependenciaID</td>
+                <td>@item.ValorUnitario</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.ID">Detalle</a>
+                    @if (User.HasClaim("Permiso", "Bienes.Editar"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.ID">Editar</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
