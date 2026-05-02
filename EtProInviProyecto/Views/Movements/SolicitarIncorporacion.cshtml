@@ -1,0 +1,91 @@
+﻿@using EtPro.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model SolicitarIncorporacionViewModel
+@{
+    ViewData["Title"] = "Solicitar Incorporación";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="SolicitarIncorporacion" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="NumeroIdentificacion" class="control-label"></label>
+                <input asp-for="NumeroIdentificacion" class="form-control" />
+                <span asp-validation-for="NumeroIdentificacion" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Marca" class="control-label"></label>
+                <input asp-for="Marca" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Modelo" class="control-label"></label>
+                <input asp-for="Modelo" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Serial" class="control-label"></label>
+                <input asp-for="Serial" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Color" class="control-label"></label>
+                <input asp-for="Color" class="form-control" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group mb-3">
+                <label asp-for="Material" class="control-label"></label>
+                <input asp-for="Material" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="ObservacionesAdicionales" class="control-label"></label>
+                <textarea asp-for="ObservacionesAdicionales" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Grupo" class="control-label"></label>
+                <input asp-for="Grupo" class="form-control" />
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="DependenciaID" class="control-label">Departamento</label>
+                <select asp-for="DependenciaID" class="form-control"
+                        asp-items="@(ViewBag.Departments as SelectList)">
+                    <option value="">-- Seleccione --</option>
+                </select>
+                <span asp-validation-for="DependenciaID" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="ValorUnitario" class="control-label"></label>
+                <input asp-for="ValorUnitario" class="form-control" />
+                <span asp-validation-for="ValorUnitario" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>

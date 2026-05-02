@@ -1,0 +1,17 @@
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model Department
+@{
+    ViewData["Title"] = "Delete Department";
+}
+<h2>@ViewData["Title"]</h2>
+<div class="alert alert-danger">
+    Are you sure you want to delete the department <strong>@Model.Name</strong>?
+</div>
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ID" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

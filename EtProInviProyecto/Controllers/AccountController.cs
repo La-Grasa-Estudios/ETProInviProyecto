@@ -54,6 +54,13 @@ namespace EtPro.Controllers
                 new Claim("DepartamentoId", user.DepartmentID?.ToString() ?? "")
             };
 
+            var permissions = await _context.UserPermission
+            .Where(up => up.UserID == user.ID)
+            .Select(up => up.Permission.Name)
+            .ToListAsync();
+
+            claims.AddRange(permissions.Select(p => new Claim("Permiso", p)));
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 

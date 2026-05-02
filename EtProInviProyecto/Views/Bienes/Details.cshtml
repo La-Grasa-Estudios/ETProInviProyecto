@@ -1,0 +1,59 @@
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model BienMueble
+@{
+    ViewData["Title"] = "Detalle del Bien";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<dl class="row">
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NumeroIdentificacion)</dt>
+    <dd class="col-sm-9">@Model.NumeroIdentificacion</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nombre)</dt>
+    <dd class="col-sm-9">@Model.Nombre</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Marca)</dt>
+    <dd class="col-sm-9">@Model.Marca</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Modelo)</dt>
+    <dd class="col-sm-9">@Model.Modelo</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Serial)</dt>
+    <dd class="col-sm-9">@Model.Serial</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Color)</dt>
+    <dd class="col-sm-9">@Model.Color</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Material)</dt>
+    <dd class="col-sm-9">@Model.Material</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ObservacionesAdicionales)</dt>
+    <dd class="col-sm-9">@Model.ObservacionesAdicionales</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Grupo)</dt>
+    <dd class="col-sm-9">@Model.Grupo</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DependenciaID)</dt>
+    <dd class="col-sm-9">@Model.DependenciaID</dd>
+
+    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ValorUnitario)</dt>
+    <dd class="col-sm-9">@Model.ValorUnitario.ToString("C")</dd>
+</dl>
+
+<div>
+    @if (User.HasClaim("Permiso", "Bienes.Editar"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.ID" class="btn btn-warning">Editar</a>
+    }
+    @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
+    {
+        <a asp-controller="Movements" asp-action="Historial" asp-route-bienId="@Model.ID" class="btn btn-info">Historial del bien</a>
+    }
+    @if (!Model.Activo)
+    {
+        <span class="badge bg-danger">Inactivo</span>
+    }
+    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+</div>

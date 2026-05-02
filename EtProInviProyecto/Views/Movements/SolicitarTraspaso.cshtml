@@ -1,0 +1,57 @@
+﻿@using EtPro.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model SolicitarTraspasoViewModel
+@{
+    ViewData["Title"] = "Solicitar Traspaso";
+}
+
+<h2>@ViewData["Title"]</h2>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="SolicitarTraspaso" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="BienId" class="control-label">Bien a trasladar</label>
+        <select asp-for="BienId" class="form-control"
+                asp-items="@(ViewBag.Bienes as SelectList)">
+            <option value="">-- Seleccione un bien --</option>
+        </select>
+        <span asp-validation-for="BienId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="DestinationDepartmentId" class="control-label">Departamento destino</label>
+        <select asp-for="DestinationDepartmentId" class="form-control"
+                asp-items="@(ViewBag.Departments as SelectList)">
+            <option value="">-- Seleccione destino --</option>
+        </select>
+        <span asp-validation-for="DestinationDepartmentId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Motivo" class="control-label">Motivo del traspaso</label>
+        <textarea asp-for="Motivo" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Motivo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>

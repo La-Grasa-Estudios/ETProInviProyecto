@@ -19,6 +19,7 @@ namespace ETPro.Data
             ("Movimientos.SolicitarTraspaso", "Solicitar traspaso de bienes", "Movimientos"),
             ("Movimientos.AprobarTraspaso", "Aprobar o rechazar solicitudes de traspaso", "Movimientos"),
             ("Movimientos.AprobarDesincorporacion", "Aprobar o rechazar desincorporaciones", "Movimientos"),
+            ("Movimientos.AprobarIncorporacion", "Aprobar o rechazar incorporaciones", "Movimientos"),
             ("Historial.VerTodos", "Ver historial de cualquier bien", "Historial"),
             ("Historial.VerPropios", "Ver historial de bienes de su departamento", "Historial"),
             ("Reportes.VerTodos", "Generar cualquier reporte", "Reportes"),
@@ -116,6 +117,15 @@ namespace ETPro.Data
                     await context.SaveChangesAsync();
                 }
 
+                if (!context.Departments.Any())
+                {
+                    context.Departments.AddRange(
+                        new Department { Name = "Informática" },
+                        new Department { Name = "Administración" },
+                        new Department { Name = "Recursos Humanos" }
+                    );
+                 }
+
                 if (!context.Bienes.Any())
                 {
                     context.Bienes.Add(new BienMueble
@@ -130,7 +140,9 @@ namespace ETPro.Data
                         ValorUnitario = 1200.00m,
                         DependenciaID = 1,
                         Grupo = 2,
-                        ObservacionesAdicionales = "Asignada al superadmin"
+                        ObservacionesAdicionales = "Asignada al superadmin",
+                        Aprobado = true,
+                        Activo = true
                     });
                     context.SaveChanges();
                 }

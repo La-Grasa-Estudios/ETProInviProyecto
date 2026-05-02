@@ -1,0 +1,58 @@
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model IEnumerable<Movement>
+@{
+    ViewData["Title"] = "Desincorporaciones Pendientes";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>No hay solicitudes de desincorporación pendientes.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Bien</th>
+                <th>Departamento</th>
+                <th>Solicitante</th>
+                <th>Fecha solicitud</th>
+                <th>Motivo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Bien?.Nombre (@item.Bien?.NumeroIdentificacion)</td>
+                    <td>@item.OriginDepartment?.Name</td>
+                    <td>@item.UsuarioSolicitante?.UserName</td>
+                    <td>@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.Motivo</td>
+                    <td>
+                        <form asp-action="AprobarDesincorporacion" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm btn-success">Aprobar</button>
+                        </form>
+                        <form asp-action="RechazarDesincorporacion" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger">Rechazar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

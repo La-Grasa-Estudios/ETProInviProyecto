@@ -14,6 +14,9 @@ namespace ETPro.Data
         public DbSet<TemplatePermission> TemplatePermissions { get; set; }
         public DbSet<TemplatePermissionDetails> TemplatePermissionDetails { get; set; }
         public DbSet<UserPermission> UserPermission { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Movement> Movements { get; set; }
+
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -61,6 +64,47 @@ namespace ETPro.Data
 
             });
             builder.Entity<BienMueble>().Property(b => b.DependenciaID).HasColumnName("DependenciaID");
+
+            builder.Entity<Department>()
+                .HasOne(d => d.Manager)
+                .WithMany()
+                .HasForeignKey(d => d.ManagerID).IsRequired(false);
+
+            builder.Entity<Department>()
+                .HasOne(d => d.Custodian)
+                .WithMany()
+                .HasForeignKey(d => d.CustodianID)
+                .IsRequired(false);
+
+            builder.Entity<Movement>()
+                .HasOne(m => m.Bien)
+                .WithMany()
+                .HasForeignKey(m => m.BienId)
+                .OnDelete(DeleteBehavior.Restrict);  
+
+            builder.Entity<Movement>()
+                .HasOne(m => m.OriginDepartment)
+                .WithMany()
+                .HasForeignKey(m => m.OriginDepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Movement>()
+                .HasOne(m => m.DestinationDepartment)
+                .WithMany()
+                .HasForeignKey(m => m.DestinationDepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Movement>()
+                .HasOne(m => m.UsuarioSolicitante)
+                .WithMany()
+                .HasForeignKey(m => m.UsuarioSolicitanteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Movement>()
+                .HasOne(m => m.UsuarioAprobador)
+                .WithMany()
+                .HasForeignKey(m => m.UsuarioAprobadorId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

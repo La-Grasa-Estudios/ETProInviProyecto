@@ -1,0 +1,36 @@
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model Department
+@{
+    ViewData["Title"] = "New Department";
+}
+<h2>@ViewData["Title"]</h2>
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group mb-3">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    div class="form-group mb-3">
+    <label asp-for="ManagerID" class="control-label">Responsable (Manager)</label>
+    <select asp-for="ManagerID" class="form-control"
+            asp-items="@(ViewBag.Managers as SelectList)">
+        <option value="">-- No asignado --</option>
+    </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="CustodianID" class="control-label">Custodio</label>
+        <select asp-for="CustodianID" class="form-control"
+                asp-items="@(ViewBag.Custodians as SelectList)">
+            <option value="">-- No asignado --</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>

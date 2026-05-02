@@ -27,7 +27,56 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Bienes" asp-action="Index">Gestionar Bienes</a>
                             </li>
+                            @if (User.HasClaim("Permiso", "Admin.Departamentos"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Department" asp-action="Index">Departamentos</a>
+                                </li>
+                            }
+                            @if (User.HasClaim("Permiso", "Movimientos.SolicitarTraspaso"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Movements" asp-action="SolicitarTraspaso">Solicitar Traspaso</a>
+                                </li>
+                            }
+                            @if (User.HasClaim("Permiso", "Bienes.Desincorporar"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Movements" asp-action="SolicitarDesincorporacion">Solicitar Desincorporación</a>
+                                </li>
+                            }
+                            @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso") || User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Aprobar</a>
+                                    <ul class="dropdown-menu">
+                                        @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso"))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesTraspaso">Traspasos pendientes</a></li>
+                                        }
+                                        @if (User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-controller="Movements" asp-action="PendientesIncorporacion">Incorporaciones pendientes</a>
+                                            </li>
+                                        }
+                                        @if (User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion"))
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesDesincorporacion">Desincorporaciones pendientes</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+
+                            @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Movements" asp-action="HistorialTraspasos">Historial de Traspasos</a>
+                                </li>
+                            }
+
                         }
+
                     </ul>
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity.IsAuthenticated)

@@ -1,0 +1,20 @@
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model BienMueble
+@{
+    ViewData["Title"] = "Eliminar Bien";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-danger">
+    <p>¿Está seguro de que desea eliminar el bien <strong>@Model.NumeroIdentificacion</strong>?</p>
+    <p><em>@Model.Nombre</em></p>
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ID" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

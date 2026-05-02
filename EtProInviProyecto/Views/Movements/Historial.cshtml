@@ -1,0 +1,53 @@
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model IEnumerable<Movement>
+@{
+    ViewData["Title"] = "Historial de Movimientos";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!Model.Any())
+{
+    <p>No hay movimientos registrados para este bien.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Bien</th>
+                <th>Tipo</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Solicitante</th>
+                <th>Aprobador</th>
+                <th>Estado</th>
+                <th>Fecha solicitud</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Bien?.Nombre (@item.Bien?.NumeroIdentificacion)</td>
+                    <td>@item.Type</td>
+                    <td>@item.OriginDepartment?.Name</td>
+                    <td>@item.DestinationDepartment?.Name</td>
+                    <td>@item.UsuarioSolicitante?.UserName</td>
+                    <td>@item.UsuarioAprobador?.UserName</td>
+                    <td>@item.Estado</td>
+                    <td>@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        @if (item.Estado == "Aprobado")
+                        {
+                            <a asp-action="Acta" asp-route-movimientoId="@item.Id" class="btn btn-sm btn-info">Acta</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

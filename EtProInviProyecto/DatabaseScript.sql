@@ -50,5 +50,38 @@ CREATE TABLE IF NOT EXISTS BienesMuebles (
     ObservacionesAdicionales VARCHAR(150) NULL,
     Grupo INT NOT NULL DEFAULT 2,
     DependenciaID INT NOT NULL,
-    ValorUnitario DECIMAL(18,2) NOT NULL
+    ValorUnitario DECIMAL(18,2) NOT NULL,
+    Activo TINYINT(1) NOT NULL DEFAULT 1,
+    Aprobado TINYINT(1) NOT NULL DEFAULT 0   
+);
+
+CREATE TABLE IF NOT EXISTS Departments (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    ManagerId VARCHAR(450) NULL,
+    CustodianId VARCHAR(450) NULL,
+    CONSTRAINT FK_Departments_Manager FOREIGN KEY (ManagerId) REFERENCES Users(ID)
+        ON DELETE SET NULL,
+    CONSTRAINT FK_Departments_Custodian FOREIGN KEY (CustodianId) REFERENCES Users(ID)
+        ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS Movements (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    BienId INT NOT NULL,
+    Type INT NOT NULL, 
+	OriginDepartmentId INT NULL,
+    DestinationDepartmentId INT NULL,
+    Motivo TEXT NOT NULL,
+    FechaSolicitud DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    Estado VARCHAR(50) NOT NULL DEFAULT 'Pendiente',
+    UsuarioSolicitanteId VARCHAR(450) NOT NULL,
+    UsuarioAprobadorId VARCHAR(450) NULL,
+    FechaAprobacion DATETIME NULL,
+
+    CONSTRAINT FK_Movements_Bien FOREIGN KEY (BienId) REFERENCES BienesMuebles(ID) ON DELETE RESTRICT,
+    CONSTRAINT FK_Movements_OriginDept FOREIGN KEY (OriginDepartmentId) REFERENCES Departments(ID) ON DELETE RESTRICT,
+    CONSTRAINT FK_Movements_DestDept FOREIGN KEY (DestinationDepartmentId) REFERENCES Departments(ID) ON DELETE RESTRICT,
+    CONSTRAINT FK_Movements_Solicitante FOREIGN KEY (UsuarioSolicitanteId) REFERENCES Users(ID) ON DELETE RESTRICT,
+    CONSTRAINT FK_Movements_Aprobador FOREIGN KEY (UsuarioAprobadorId) REFERENCES Users(ID) ON DELETE RESTRICT
 );

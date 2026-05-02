@@ -1,20 +1,28 @@
-﻿@using EtPro.Models
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model IEnumerable<BienMueble>
-<h2>Inventario de bienes</h2>
+@{
+    ViewData["Title"] = "Inventario de Bienes";
+}
+
+<h2>@ViewData["Title"]</h2>
 
 @if (User.HasClaim("Permiso", "Bienes.Crear"))
 {
-    <a asp-action="Create" class="btn btn-primary">Nuevo bien</a>
+    <p>
+        <a asp-controller="Movements" asp-action="SolicitarIncorporacion" class="btn btn-primary">Solicitar Incorporación</a>
+    </p>
 }
 
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(model => model.NumeroIdentificacion)</th>
             <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.Marca)</th>
             <th>@Html.DisplayNameFor(model => model.DependenciaID)</th>
             <th>@Html.DisplayNameFor(model => model.ValorUnitario)</th>
-            <th></th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -23,13 +31,22 @@
             <tr>
                 <td>@item.NumeroIdentificacion</td>
                 <td>@item.Nombre</td>
+                <td>@item.Marca</td>
                 <td>@item.DependenciaID</td>
-                <td>@item.ValorUnitario</td>
+                <td>@item.ValorUnitario.ToString("C")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.ID">Detalle</a>
+                    <a asp-action="Details" asp-route-id="@item.ID" class="btn btn-sm btn-info">Detalles</a>
                     @if (User.HasClaim("Permiso", "Bienes.Editar"))
                     {
-                        <a asp-action="Edit" asp-route-id="@item.ID">Editar</a>
+                        <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-sm btn-warning">Editar</a>
+                    }
+                    @if (User.HasClaim("Permiso", "Bienes.Desincorporar"))
+                    {
+                        <a asp-controller="Movements" asp-action="SolicitarDesincorporacion" class="btn btn-sm btn-danger">Solicitar Desincorporación</a>
+                    }
+                    @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
+                    {
+                        <a asp-controller="Movements" asp-action="Historial" asp-route-bienId="@item.ID" class="btn btn-sm btn-info">Historial</a>
                     }
                 </td>
             </tr>

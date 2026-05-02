@@ -39,6 +39,10 @@ public class BienMueble
     [Column(TypeName = "decimal(18, 2)")]
     public decimal ValorUnitario { get; set; }
 
+    public bool Activo { get; set; } = true;
+    public bool Aprobado { get; set; } = false;
+
+
     [NotMapped]
     public string DescripcionBM1
     {

@@ -1,0 +1,53 @@
+﻿@using EtPro.Models;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model Movement
+@{
+    ViewData["Title"] = "Acta de Movimiento";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h4>@(Model.Type == MovementType.Traspaso ? "Traspaso" : "Desincorporación") – Acta oficial</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Número de identificación</dt>
+            <dd class="col-sm-9">@Model.Bien?.NumeroIdentificacion</dd>
+
+            <dt class="col-sm-3">Nombre del bien</dt>
+            <dd class="col-sm-9">@Model.Bien?.Nombre</dd>
+
+            <dt class="col-sm-3">Tipo de movimiento</dt>
+            <dd class="col-sm-9">@Model.Type</dd>
+
+            <dt class="col-sm-3">Departamento origen</dt>
+            <dd class="col-sm-9">@Model.OriginDepartment?.Name</dd>
+
+            @if (Model.Type == MovementType.Traspaso)
+            {
+                <dt class="col-sm-3">Departamento destino</dt>
+                <dd class="col-sm-9">@Model.DestinationDepartment?.Name</dd>
+            }
+
+            <dt class="col-sm-3">Motivo</dt>
+            <dd class="col-sm-9">@Model.Motivo</dd>
+
+            <dt class="col-sm-3">Solicitante</dt>
+            <dd class="col-sm-9">@Model.UsuarioSolicitante?.UserName</dd>
+
+            <dt class="col-sm-3">Aprobador</dt>
+            <dd class="col-sm-9">@Model.UsuarioAprobador?.UserName</dd>
+
+            <dt class="col-sm-3">Fecha de aprobación</dt>
+            <dd class="col-sm-9">@Model.FechaAprobacion?.ToString("dd/MM/yyyy HH:mm")</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="javascript:window.print()" class="btn btn-primary">Imprimir</a>
+    <a asp-action="Historial" asp-route-bienId="@Model.BienId" class="btn btn-secondary">Volver al historial</a>
+</div>
