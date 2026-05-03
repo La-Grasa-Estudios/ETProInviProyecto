@@ -1,11 +1,9 @@
 ﻿using EtPro.Models;
-using ETPro.Data;
-using ETPro.Models;
-using ETPro.Services;
+using EtPro.Data;
 using Microsoft.EntityFrameworkCore;
+using EtPro.Services;
 
-
-namespace ETPro.Data
+namespace EtPro.Data
 {
     public static class DbInitializer
     {
@@ -58,9 +56,12 @@ namespace ETPro.Data
                 {
                     "Bienes.VerTodos", "Bienes.Crear", "Bienes.Editar",
                     "Movimientos.AprobarTraspaso", "Movimientos.AprobarDesincorporacion",
+                    "Movimientos.AprobarIncorporacion",  
                     "Historial.VerTodos", "Reportes.VerTodos",
-                    "Etiquetas.Generar", "Etiquetas.Ignorar", "Inventario.Confirmar"
+                    "Etiquetas.Generar", "Etiquetas.Ignorar", "Inventario.Confirmar",
+                    "Bienes.VerPropios", "Historial.VerPropios", "Reportes.VerPropios"
                 };
+                
                 var admin = new TemplatePermission { Name = "Administrador de Bienes", Description = "Gestión total de bienes y aprobaciones" };
                 admin.Details = all.Where(p => adminPermissions.Contains(p.Name))
                                    .Select(p => new TemplatePermissionDetails { PermissionInstance = p }).ToList();
@@ -87,65 +88,69 @@ namespace ETPro.Data
                                      .Select(p => new TemplatePermissionDetails { PermissionInstance = p }).ToList();
                 context.TemplatePermissions.Add(watcher);
 
-                var consultPermissions = new[] {
-                    "Bienes.VerTodos", "Historial.VerTodos", "Reportes.VerTodos"
+                var consultPermissions = new[] 
+                {
+                    "Bienes.VerTodos", "Historial.VerTodos", "Reportes.VerTodos",
+                    "Bienes.VerPropios", "Historial.VerPropios", "Reportes.VerPropios"
                 };
-                var consult = new TemplatePermission { Name = "Consulta / Auditoría", Description = "Solo lectura de toda la información" };
+                var consult = new TemplatePermission { Name = "Consulta / Audi  toría", Description = "Solo lectura de toda la información" };
                 consult.Details = all.Where(p => consultPermissions.Contains(p.Name))
                                      .Select(p => new TemplatePermissionDetails { PermissionInstance = p }).ToList();
                 context.TemplatePermissions.Add(consult);
 
                 await context.SaveChangesAsync();
 
-                if (!context.Users.Any(u => u.UserName == "superadmin"))
-                {
-                    var superuser = new User
-                    {
-                        ID = Guid.NewGuid().ToString(),
-                        UserName = "superadmin",
-                        PasswordHash = PasswordHashingService.HashPassword("superadmin"),
-                        DepartmentID = null
-                    };  
-                    context.Users.Add(superuser);
-                    await context.SaveChangesAsync();
+                
+            }
 
-                    var allSuperPermission = await context.Permissions.ToListAsync();
-                    foreach (var permission in allSuperPermission)
-                    {
-                        context.UserPermission.Add(new UserPermission { UserID = superuser.ID, PermissionID = permission.ID });
-                    }
-                    await context.SaveChangesAsync();
+            if (!context.Users.Any(u => u.UserName == "superadmin"))
+            {
+                var superuser = new User
+                {
+                    ID = Guid.NewGuid().ToString(),
+                    UserName = "superadmin",
+                    PasswordHash = PasswordHashingService.HashPassword("superadmin"),
+                    DepartmentID = null
+                };
+                context.Users.Add(superuser);
+                await context.SaveChangesAsync();
+
+                var allSuperPermission = await context.Permissions.ToListAsync();
+                foreach (var permission in allSuperPermission)
+                {
+                    context.UserPermission.Add(new UserPermission { UserID = superuser.ID, PermissionID = permission.ID });
                 }
+                await context.SaveChangesAsync();
+            }
 
-                if (!context.Departments.Any())
-                {
-                    context.Departments.AddRange(
-                        new Department { Name = "Informática" },
-                        new Department { Name = "Administración" },
-                        new Department { Name = "Recursos Humanos" }
-                    );
-                 }
+            if (!context.Departments.Any())
+            {
+                context.Departments.AddRange(
+                    new Department { Name = "Informática" },
+                    new Department { Name = "Administración" },
+                    new Department { Name = "Recursos Humanos" }
+                );
+            }
 
-                if (!context.Bienes.Any())
+            if (!context.Bienes.Any())
+            {
+                context.Bienes.Add(new BienMueble
                 {
-                    context.Bienes.Add(new BienMueble
-                    {
-                        NumeroIdentificacion = "BIEN-2025-001",
-                        Nombre = "Laptop HP ProBook 450 G9",
-                        Marca = "HP",
-                        Modelo = "450 G9",
-                        Serial = "SN123456",
-                        Color = "Negro",
-                        Material = "Plástico y metal",
-                        ValorUnitario = 1200.00m,
-                        DependenciaID = 1,
-                        Grupo = 2,
-                        ObservacionesAdicionales = "Asignada al superadmin",
-                        Aprobado = true,
-                        Activo = true
-                    });
-                    context.SaveChanges();
-                }
+                    NumeroIdentificacion = "BIEN-2025-001",
+                    Nombre = "Laptop HP ProBook 450 G9",
+                    Marca = "HP",
+                    Modelo = "450 G9",
+                    Serial = "SN123456",
+                    Color = "Negro",
+                    Material = "Plástico y metal",
+                    ValorUnitario = 1200.00m,
+                    DependenciaID = 1,
+                    Grupo = 2,
+                    ObservacionesAdicionales = "Asignada al superadmin",
+                    Aprobado = true,
+                    Activo = true
+                });
+                context.SaveChanges();
             }
         }
     }

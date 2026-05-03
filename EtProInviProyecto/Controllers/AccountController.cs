@@ -1,7 +1,6 @@
 ﻿using EtPro.Models;
-using ETPro.Data;
-using ETPro.Models;
-using ETPro.Services;
+using EtPro.Data;
+using EtPro.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +14,6 @@ namespace EtPro.Controllers
     public class AccountController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly PasswordHashingService _passwordService;
 
         public AccountController(AppDbContext context)
         {
@@ -51,7 +49,7 @@ namespace EtPro.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.ID),
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim("DepartamentoId", user.DepartmentID?.ToString() ?? "")
+                new Claim("DepartmentId", user.DepartmentID?.ToString() ?? "")
             };
 
             var permissions = await _context.UserPermission
@@ -84,50 +82,6 @@ namespace EtPro.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            if (await _context.Users.AnyAsync(u => u.UserName == model.UserName))
-            {
-                ModelState.AddModelError(nameof(model.UserName), "El nombre de usuario ya está en uso.");
-                return View(model);
-            }
-
-            var user = new User
-            {
-                UserName = model.UserName,
-                PasswordHash = PasswordHashingService.HashPassword(model.Password),
-                DepartmentID = model.DeparmentID
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.ID),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim("DepartamentoId", user.DepartmentID?.ToString() ?? "")
-            };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-            return RedirectToAction("Index", "Home");
-        }
 
         [HttpGet]
         public IActionResult AccessDenied()

@@ -1,5 +1,5 @@
 ﻿
-namespace ETPro.Services
+namespace EtPro.Services
 {
     public class PasswordHashingService
     {

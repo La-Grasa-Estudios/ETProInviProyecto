@@ -1,0 +1,61 @@
+﻿@using EtPro.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model IEnumerable<User>
+@{
+    ViewData["Title"] = "Administración de Usuarios";
+}
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Usuario</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Departamento</th>
+            <th>Permisos asignados</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>
+                    @if (user.DepartmentID.HasValue)
+                    {
+                        var departments = (Dictionary<int, string>)ViewBag.Departments;
+                        @(departments.ContainsKey(user.DepartmentID.Value)
+                                        ? departments[user.DepartmentID.Value]
+                                        : "Desconocido")
+                    }
+                    else
+                    {
+                        <text>Sin departamento</text>
+                    }
+                </td>
+                <td>@user.ActualUserPermissions?.Count()</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@user.ID" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="ManagePermissions" asp-route-id="@user.ID" class="btn btn-sm btn-info">Permisos</a>
+                    @if (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != user.ID)
+                    {
+                        <form asp-action="Delete" asp-route-id="@user.ID" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este usuario?')">Eliminar</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,4 +1,4 @@
-﻿using ETPro.Models;
+﻿using EtPro.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace EtPro.Models

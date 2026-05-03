@@ -1,5 +1,5 @@
 ﻿using EtPro.Models;
-using ETPro.Data;
+using EtPro.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

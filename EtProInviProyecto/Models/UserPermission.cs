@@ -1,4 +1,4 @@
-﻿namespace ETPro.Models
+﻿namespace EtPro.Models
 {
     public class UserPermission
     {

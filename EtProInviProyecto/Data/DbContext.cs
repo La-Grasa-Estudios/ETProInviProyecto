@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ETPro.Models;
+using EtPro.Models;
 using EtPro.Models;
 using EtPro.Models;
 
-namespace ETPro.Data
+namespace EtPro.Data
 {
     public class AppDbContext : DbContext
     {
@@ -105,6 +105,17 @@ namespace ETPro.Data
                 .WithMany()
                 .HasForeignKey(m => m.UsuarioAprobadorId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<TemplatePermissionDetails>(entity =>
+            {
+                entity.HasOne(d => d.Template)
+                      .WithMany(t => t.Details)
+                      .HasForeignKey(d => d.TemplateID);
+
+                entity.HasOne(d => d.PermissionInstance)
+                      .WithMany(p => p.TemplatePermissionInfo)
+                      .HasForeignKey(d => d.PermissionID);
+            });
         }
     }
 }

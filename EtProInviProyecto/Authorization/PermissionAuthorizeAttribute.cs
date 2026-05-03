@@ -8,7 +8,6 @@ public class PermissionAuthorizeAttribute : AuthorizeAttribute, IAuthorizationRe
     public PermissionAuthorizeAttribute(string permission)
     {
         Permission = permission;
-        Policy = "PermissionPolicy"; 
     }
 
     public IEnumerable<IAuthorizationRequirement> GetRequirements()
