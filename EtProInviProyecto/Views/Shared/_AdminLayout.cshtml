@@ -1,0 +1,100 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    string initials = "";
+    var fullName = User.Identity?.Name;
+
+    if (!string.IsNullOrEmpty(fullName))
+    {
+        var words = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var word in words)
+        {
+            initials += word[0];
+        }
+        initials = initials.ToUpper();
+        if (initials.Length > 2)
+        {
+            initials = initials.Substring(0, 2);
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/management.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="sidebar hidden">
+        <div class="sidebar-header">
+            <img src="~/imagenes/logo.jpg" alt="Ingaturronña" class="logo" />
+        </div>
+        <nav class="nav-links">
+            <a href="/Home/Dashboard" class="@(ViewContext.HttpContext.Request.Path == "/Home/Dashboard" ? "active" : "")">Dashboard</a>
+            <a href="/Home/Bienes" class="@(ViewContext.HttpContext.Request.Path == "/Home/Bienes" ? "active" : "")">Bienes</a>
+        <div class="logout-container">
+            <div class="logout-form">
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </div>
+        </div>
+        <button onclick="toggleSidebar()" class="sidebar-toggle-button"></button>
+    </div>
+    <div class="main-content">
+        <div class="management-header">
+                <div class="header-logo">
+                    <img src="~/imagenes/logo.jpg" alt="Ingaturronña" class="logo" />
+                </div>
+            <div class="page-name group-vertical">
+                <h2><b>@ViewData["PageName"]</b></h2>
+                <a><b>@ViewData["PageDescription"]</b></a>
+            </div>
+            <div class="actions">
+                <div class="search-bar input-group-text">
+                    <div class="search-icon-container">
+                        <img src="~/imagenes/search-icon.png" alt="Busqueda" class="search-icon" />
+                    </div>
+                    <input placeholder="Buscar bienes, codigos, responsables" />
+                </div>
+                <div class="notifications-container">
+                    <img src="~/imagenes/bell.png" alt="Notificaciones" class="notification-bell" />
+                </div>
+                <div class="profile-container">
+                    <div class="profile-bubble">
+                        <span class="profile-initials">@initials</span>
+                    </div>
+                    <div class="profile-name">
+                        <span><b>@(User.Identity != null ? User.Identity.Name : "Desconocido")</b></span>
+                        <span>Unidad de bienes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @RenderBody()
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('hidden');
+        }
+
+        document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.add('hidden');
+        });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

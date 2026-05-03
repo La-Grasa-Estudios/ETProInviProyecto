@@ -1,0 +1,210 @@
+﻿@model EtProInviProyecto.Models.BienesRegistradosViewModel;
+@{
+    Layout = "_AdminLayout";
+    ViewData["PageName"] = "Dashboard";
+    ViewData["PageDescription"] = "Resumen general del inventario";
+}
+<link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+<div class="dashboard-container">
+    <div class="info-container">
+        <div class="dashboard-info" style="background-color: green;">
+            <div class="dashboard-icon">
+                <div class="dashboard-icon-bg"></div>
+            </div>
+            <div class="dashboard-data">
+                <h5 class="dashboard-info-title">Total de bienes global</h5>
+                <h1 class="dashboard-number">@Model.TotalBienes</h1>
+                <h6>Todos los bienes registrados</h6>
+            </div>
+        </div>
+        <div class="dashboard-info" style="background-color: red;">
+            <div class="dashboard-icon">
+                <div class="dashboard-icon-bg"></div>
+            </div>
+            <div class="dashboard-data">
+                <h5 class="dashboard-info-title">Solicitudes pendientes</h5>
+                <h1 class="dashboard-number">0</h1>
+                <h6>Por atender</h6>
+            </div>
+        </div>
+        <div class="dashboard-info" style="background-color: orange;">
+            <div class="dashboard-icon">
+                <div class="dashboard-icon-bg"></div>
+            </div>
+            <div class="dashboard-data">
+                <h5 class="dashboard-info-title">Etiquetas desactualizadas</h5>
+                <h1 class="dashboard-number">0</h1>
+                <h6>Requieren actualizacion</h6>
+            </div>
+        </div>
+        <div class="dashboard-info" style="background-color: white; color: black;">
+            <div class="dashboard-icon">
+                <div class="dashboard-icon-bg" style="background-color: lightgray;"></div>
+            </div>
+            <div class="dashboard-data">
+                <h5 class="dashboard-info-title">Total de bienes en mi departamento</h5>
+                <h1 class="dashboard-number">0</h1>
+                <h6>Almacen General</h6>
+            </div>
+        </div>
+        <div class="graph-container">
+            <div class="graph-header">
+                <span><b>Estado del Inventario</b></span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="inventoryChart"></canvas>
+                    <div class="chart-center-text">
+                        <span class="total-number">@Model.TotalBienes.ToString("N0")</span>
+                        <span class="total-label">Total</span>
+                    </div>
+                </div>
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <span class="dot green"></span>
+                        <span class="label">Activos</span>
+                        <span class="value">@Model.TotalActivos.ToString("N0") (@((Model.TotalActivos / (float)Model.TotalBienes).ToString("P1")))</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot orange"></span>
+                        <span class="label">En Traspaso</span>
+                        <span class="value">@Model.TotalMantenimiento.ToString("N0") (@((Model.TotalMantenimiento / (float)Model.TotalBienes).ToString("P1")))</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot red"></span>
+                        <span class="label">Pendientes</span>
+                        <span class="value">0 (1,4%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="dot grey"></span>
+                        <span class="label">Desincorporados</span>
+                        <span class="value">0 (2,1%)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="graph-container">
+            <div class="graph-header">
+                <span><b>Alertas y notificaciones</b></span>
+            </div>
+            <div class="alerts-container">
+                <div class="alert-container">
+                    <div class="alert-bubble alert-green">
+                        <img src="~/imagenes/spanner.png" alt="Spanner" class="spanner-icon" />
+                    </div>
+                    <div class="alert-description">
+                        <span><b>16 bienes requieren mantenimiento</b></span>
+                        <span>Equipos y mobiliarios pendientes de revision</span>
+                    </div>
+                    <div class="alert-details">
+                        <span><b>Hoy</b></span>
+                        <a>Ver detalles</a>
+                    </div>
+                </div>
+                <div class="alert-container">
+                    <div class="alert-bubble alert-red">
+                        <img src="~/imagenes/spanner.png" alt="Spanner" class="spanner-icon" />
+                    </div>
+                    <div class="alert-description">
+                        <span><b>8 bienes fuera de servicio</b></span>
+                        <span>Requieren evaluacion o reparacion</span>
+                    </div>
+                    <div class="alert-details">
+                        <span><b>Hoy</b></span>
+                        <a>Ver detalles</a>
+                    </div>
+                </div>
+                <div class="alert-container">
+                    <div class="alert-bubble alert-orange">
+                        <img src="~/imagenes/spanner.png" alt="Spanner" class="spanner-icon" />
+                    </div>
+                    <div class="alert-description">
+                        <span><b>8 bienes fuera de servicio</b></span>
+                        <span>Requieren evaluacion o reparacion</span>
+                    </div>
+                    <div class="alert-details">
+                        <span><b>Hoy</b></span>
+                        <a>Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="search-container">
+            <h4><b>Busqueda Rapida</b></h4>
+            <h6>Encuentra bienes utilizando diferentes criterios de busqueda</h6>
+            <div class="search-filter-container">
+                <div class="filter-container">
+                    <span><b>Codigo del bien</b></span>
+                    <div class="input-container">
+                        <input placeholder="Ej: BI-0001234"/>
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <span><b>Nombre del bien</b></span>
+                    <div class="input-container">
+                        <input placeholder="Ej: Computadora" />
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <span><b>Departamento</b></span>
+                    <div class="input-container">
+                        
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <span><b>Estado</b></span>
+                    <div class="input-container">
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <span><b>Responsable</b></span>
+                    <div class="input-container">
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <span><b>Ubicacion</b></span>
+                    <div class="input-container">
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <span><b>Tipo de bien</b></span>
+                    <div class="input-container">
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <span class="invisible">Padding</span>
+                    <div class="filter-button-container">
+                        <a><b>Limpiar Filtros</b></a>
+                        <div class="search-button">
+                            <img src="~/imagenes/search-icon.png" alt="Busqueda" class="search-icon" />
+                            <button>Buscar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('inventoryChart').getContext('2d');
+    const inventoryChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+    datasets: [{
+    data: [@Model.TotalActivos, @Model.TotalMantenimiento, 0, 0],
+    backgroundColor: ['#1a7a44', '#f39c12', '#e31e24', '#bdc3c7'],
+    borderWidth: 0,
+    cutout: '65%'
+    }]
+    },
+    options: {
+    responsive: true,
+    plugins: {
+    legend: { display: false }
+    }
+    }
+    });
+</script>
+
+

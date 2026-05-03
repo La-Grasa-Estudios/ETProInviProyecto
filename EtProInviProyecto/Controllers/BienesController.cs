@@ -19,6 +19,25 @@ namespace EtPro.Controllers
             _context = context;
         }
 
+        [Route("/api/Lista")]
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Lista(int pagina = 1, int resultadosPorPagina = 10)
+        {
+            resultadosPorPagina = Math.Min(resultadosPorPagina, 20);
+            pagina = Math.Max(pagina, 1);
+
+            var query = _context.Bienes.AsQueryable();
+            int total = await query.CountAsync();
+            var items = await query
+            .OrderBy(b => b.ID)
+            .Skip((pagina - 1) * resultadosPorPagina)
+            .Take(resultadosPorPagina)
+            .ToListAsync();
+
+            return Json(items);
+        }
+
         [PermissionAuthorize("Bienes.VerPropios")]
         public async Task<IActionResult> Index()
         {
@@ -244,12 +263,12 @@ namespace EtPro.Controllers
         [HttpPost]
         [PermissionAuthorize("Bienes.Editar")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int ID)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,NumeroIdentificacion,Nombre,Marca,Modelo,Serial,Color,Material,ObservacionesAdicionales,Grupo,DependenciaID,ValorUnitario")] BienMueble bienEditado)
         {
-            if (ID == null) return NotFound();
+            if (id != bienEditado.ID) return NotFound();
 
-            var bien = await _context.Bienes.FindAsync(ID);
-            if (bien == null || !bien.Activo) return NotFound();
+            var bienOriginal = await _context.Bienes.AsNoTracking().FirstOrDefaultAsync(b => b.ID == id);
+            if (bienOriginal == null || !bienOriginal.Activo) return NotFound();
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var deptIdClaim = User.FindFirst("DepartmentId")?.Value;
@@ -261,17 +280,37 @@ namespace EtPro.Controllers
             {
                 if (int.TryParse(deptIdClaim, out int deptId))
                 {
-                    if (bien.DependenciaID != deptId)
-                        return Forbid();
+                    if (bienOriginal.DependenciaID != deptId) return Forbid();
                 }
                 else
                 {
-                    return Forbid(); 
+                    return Forbid();
                 }
             }
 
-            ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name", bien.DependenciaID);
-            return View(bien);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await Task.Delay(1000);
+
+                    bienEditado.Activo = bienOriginal.Activo;
+                    bienEditado.Aprobado = bienOriginal.Aprobado;
+
+                    _context.Update(bienEditado);
+                    await _context.SaveChangesAsync();
+
+                    TempData["Success"] = "El bien ha sido actualizado correctamente.";
+                    return Redirect("/Home/Bienes");
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return NotFound();
+                }
+            }
+
+            ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name", bienEditado.DependenciaID);
+            return View(bienEditado);
         }
 
         //[PermissionAuthorize("Bienes.Desincorporar")]

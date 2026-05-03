@@ -1,80 +1,179 @@
 ﻿@using EtPro.Models;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model BienMueble
+
 @{
-    ViewData["Title"] = "Editar Bien";
+    ViewData["Title"] = "Modificar Registro de Bien";
+    Layout = "_AdminLayout";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom-0 pt-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
+                    <h4 class="mb-0 text-dark fw-bold">@ViewData["Title"]</h4>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-secondary border px-3 py-2">ID INTERNO: @Model.ID</span>
+                </div>
+            </div>
+            <hr class="mt-3 mb-0" style="opacity: 0.1;">
+        </div>
 
-<form asp-action="Edit" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="ID" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="card-body p-4">
+            <form id="editForm" asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ID" />
 
-    <div class="form-group mb-3">
-        <label asp-for="NumeroIdentificacion" class="control-label"></label>
-        <input asp-for="NumeroIdentificacion" class="form-control" />
-        <span asp-validation-for="NumeroIdentificacion" class="text-danger"></span>
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-4 p-2 bg-light rounded"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="NumeroIdentificacion" class="form-label fw-bold small text-uppercase text-muted">Nº de Identificación</label>
+                        <input asp-for="NumeroIdentificacion" class="form-control form-control-sm bg-light fw-bold" readonly />
+                        <span asp-validation-for="NumeroIdentificacion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label asp-for="Nombre" class="form-label fw-bold small text-uppercase text-muted">Nombre del Elemento</label>
+                        <input asp-for="Nombre" class="form-control form-control-sm" placeholder="Ingrese nombre descriptivo" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Marca" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Marca" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Modelo" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Modelo" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Serial" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Serial" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Color" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Color" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Material" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Material" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label asp-for="Grupo" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Grupo" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="DependenciaID" class="form-label fw-bold small text-uppercase text-muted">Departamento Asignado</label>
+                        <select asp-for="DependenciaID" class="form-select form-select-sm"
+                                asp-items="@(ViewBag.Departments as SelectList)">
+                            <option value="">-- Seleccione Ubicación --</option>
+                        </select>
+                        <span asp-validation-for="DependenciaID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="ValorUnitario" class="form-label fw-bold small text-uppercase text-muted">Valor en Libros (Bs)</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-end-0">Bs.</span>
+                            <input asp-for="ValorUnitario" class="form-control form-control-sm text-end fw-bold border-start-0" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="ObservacionesAdicionales" class="form-label fw-bold small text-uppercase text-muted">Notas y Observaciones de la Modificación</label>
+                        <textarea asp-for="ObservacionesAdicionales" class="form-control form-control-sm" rows="3" placeholder="Indique motivos del cambio o detalles relevantes..."></textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                    <div class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i> Verifique los datos antes de confirmar.
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a asp-controller="Home" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm px-4">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-sm px-4 text-white shadow-sm" style="background-color: #004d26; border: none;">
+                            <i class="bi bi-cloud-upload me-1"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Nombre" class="control-label"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
-    </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <div class="form-group mb-3">
-        <label asp-for="Marca" class="control-label"></label>
-        <input asp-for="Marca" class="form-control" />
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('editForm');
 
-    <div class="form-group mb-3">
-        <label asp-for="Modelo" class="control-label"></label>
-        <input asp-for="Modelo" class="form-control" />
-    </div>
+        form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Detener envío para mostrar alerta
 
-    <div class="form-group mb-3">
-        <label asp-for="Serial" class="control-label"></label>
-        <input asp-for="Serial" class="form-control" />
-    </div>
+        Swal.fire({
+        title: '¿Desea aplicar los cambios?',
+        text: "La información del bien @Model.NumeroIdentificacion será actualizada permanentemente.",
+        icon: 'warning',
+        theme: 'auto',
+        showCancelButton: true,
+        confirmButtonColor: '#004d26',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, confirmar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+        }).then((result) => {
+        if (result.isConfirmed) {
+        Swal.fire({
+        title: 'Procesando...',
+        theme: 'auto',
+        didOpen: () => { Swal.showLoading() },
+        allowOutsideClick: false
+        });
+        form.submit();
+        }
+        });
+        });
+        });
+    </script>
+}
 
-    <div class="form-group mb-3">
-        <label asp-for="Color" class="control-label"></label>
-        <input asp-for="Color" class="form-control" />
-    </div>
+<style>
+    body {
+    background-color: #f4f6f9;
+    }
 
-    <div class="form-group mb-3">
-        <label asp-for="Material" class="control-label"></label>
-        <input asp-for="Material" class="form-control" />
-    </div>
+    .card {
+    border-radius: 12px;
+    }
 
-    <div class="form-group mb-3">
-        <label asp-for="ObservacionesAdicionales" class="control-label"></label>
-        <textarea asp-for="ObservacionesAdicionales" class="form-control"></textarea>
-    </div>
+    .form-label {
+    margin-bottom: 0.3rem;
+    font-size: 0.7rem;
+    }
 
-    <div class="form-group mb-3">
-        <label asp-for="Grupo" class="control-label"></label>
-        <input asp-for="Grupo" class="form-control" />
-    </div>
+    .form-control:focus, .form-select:focus {
+    border-color: #004d26;
+    box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.15);
+    }
 
-    <div class="form-group mb-3">
-        <label asp-for="DependenciaID" class="control-label"></label>
-        <select asp-for="DependenciaID" class="form-control"
-                asp-items="@(ViewBag.Departments as SelectList)">
-            <option value="">-- Seleccione Departamento --</option>
-        </select>
-        <span asp-validation-for="DependenciaID" class="text-danger"></span>
-    </div>
+    .input-group-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+    }
 
-    <div class="form-group mb-3">
-        <label asp-for="ValorUnitario" class="control-label"></label>
-        <input asp-for="ValorUnitario" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-    </div>
-</form>
+    /* Estilo para inputs de solo lectura */
+    input[readonly] {
+    background-color: #fdfdfd !important;
+    border-style: dashed;
+    color: #495057;
+    }
+</style>

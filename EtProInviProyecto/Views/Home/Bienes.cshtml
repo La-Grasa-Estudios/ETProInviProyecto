@@ -1,0 +1,169 @@
+﻿@model EtProInviProyecto.Models.BienesRegistradosViewModel;
+@{
+    Layout = "_AdminLayout";
+    ViewData["PageName"] = "Bienes Registrados";
+    ViewData["PageDescription"] = "Control y consulta de los bienes institucionales registrados en el sistema";
+}
+
+<link rel="stylesheet" href="~/css/bienes.css" asp-append-version="true" />
+
+<div class="main-container">
+    <div class="actions-container">
+        @if (User.HasClaim("Permiso", "Bienes.Crear"))
+        {
+            <div class="stylized-button">
+            <button onclick="window.location.href='/Bienes/Create'">Registrar bien</button>
+            </div>
+        }
+    </div>
+    <div class="info-content">
+        <div class="inventory-stats-container green">
+            <div class="inventory-bubble">
+
+            </div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalBienes</h3>
+                <span id="totalBienes" data-id="@Model.TotalBienes">Total de bienes</span>
+            </div>
+        </div>
+        <div class="inventory-stats-container white">
+            <div class="inventory-bubble">
+            </div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalActivos</h3>
+                <span>Bienes activos</span>
+            </div>
+        </div>
+        <div class="inventory-stats-container red">
+            <div class="inventory-bubble">
+            </div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalMantenimiento</h3>
+                <span>En mantenimiento</span>
+            </div>
+        </div>
+        <div class="inventory-stats-container white">
+            <div class="inventory-bubble">
+            </div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalDesincorporados</h3>
+                <span>Desincorporados</span>
+            </div>
+        </div>
+        <div class="item-container span4">
+            <div class="item-header">
+                <span><b>Filtros de busqueda</b></span>
+            </div>
+            <div class="search-container">
+                <div class="search-filter-container">
+                    <div class="filter-container">
+                        <span><b>Grupo</b></span>
+                        <div class="input-container">
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Subgrupo</b></span>
+                        <div class="input-container">
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Seccion</b></span>
+                        <div class="input-container">
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Nº de identificacion</b></span>
+                        <div class="input-container">
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Nombre / Descripcion</b></span>
+                        <div class="input-container input-group-text">
+                            <input placeholder="Buscar por nombre o descripcion" />
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Unidad de trabajo o dependencia</b></span>
+                        <div class="input-container">
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Responsable</b></span>
+                        <div class="input-container">
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Fecha de registro</b></span>
+                        <div class="input-container">
+                        </div>
+                    </div>
+                    <div class="filter-container span4 search-form">
+                        <span class="invisible">Padding</span>
+                        <div class="filter-button-container">
+                            <a><b>Limpiar Filtros</b></a>
+                            <div class="search-button">
+                                <img src="~/imagenes/search-icon.png" alt="Busqueda" class="search-icon" />
+                                <button>Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item-container span4 table-container">
+            <div class="item-header">
+                <span><b>Listado de bienes</b></span>
+            </div>
+            <table class="custom-inventory-table">
+                <thead>
+                    <tr>
+                        <th>Grupo</th>
+                        <th>Nº de identificacion</th>
+                        <th>Marca</th>
+                        <th>Nombre</th>
+                        <th>Valor Total (Bs)</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTable">
+                    
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between align-items-center mt-3 p-2 bg-white border-top">
+                <div class="text-secondary" id="infoPaginacion">
+                    Mostrando <span id="rangoInicio">0</span> a <span id="rangoFin">0</span> de <span id="totalDisplay">0</span> registros
+                </div>
+
+                <div class="d-flex align-items-center gap-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-secondary small">Filas por página:</span>
+                        <select id="selectResultados" class="form-select form-select-sm" style="width: 70px;" onchange="cambiarCantidad()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    <nav aria-label="Navegacion">
+                        <ul class="pagination pagination-sm mb-0" id="paginacionLista">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/bienes.js"></script>
+@if (TempData["Success"] != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', () =>
+        {
+            Swal.fire({
+                title: 'Correcto',
+                text: 'Bien actualizado correctamente!',
+                icon: 'success',
+                confirmButtonText: 'Continuar',
+                theme: 'auto'
+            })
+        });
+    </script>
+}

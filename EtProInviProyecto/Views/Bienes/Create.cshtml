@@ -3,77 +3,107 @@
 @model BienMueble
 @{
     ViewData["Title"] = "Nuevo Bien";
+    Layout = "_AdminLayout";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom-0 pt-3">
+            <div class="d-flex align-items-center">
+                <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
+                <h4 class="mb-0 text-dark fw-bold">@ViewData["Title"]</h4>
+            </div>
+            <hr class="mt-3 mb-0" style="opacity: 0.1;">
+        </div>
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
-    <div class="form-group mb-3">
-        <label asp-for="NumeroIdentificacion" class="control-label"></label>
-        <input asp-for="NumeroIdentificacion" class="form-control" />
-        <span asp-validation-for="NumeroIdentificacion" class="text-danger"></span>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="NumeroIdentificacion" class="form-label fw-semibold small text-uppercase text-secondary">Nº de Identificación</label>
+                        <input asp-for="NumeroIdentificacion" class="form-control form-control-sm" placeholder="Ej: ET-00000" />
+                        <span asp-validation-for="NumeroIdentificacion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label asp-for="Nombre" class="form-label fw-semibold small text-uppercase text-secondary">Nombre del Bien</label>
+                        <input asp-for="Nombre" class="form-control form-control-sm" placeholder="Nombre descriptivo" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Marca" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                        <input asp-for="Marca" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Modelo" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                        <input asp-for="Modelo" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Serial" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                        <input asp-for="Serial" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="Color" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                        <input asp-for="Color" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Material" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                        <input asp-for="Material" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label asp-for="Grupo" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                        <input asp-for="Grupo" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="DependenciaID" class="form-label fw-semibold small text-uppercase text-secondary">Departamento</label>
+                        <select asp-for="DependenciaID" class="form-select form-select-sm"
+                                asp-items="@(ViewBag.Departments as SelectList)">
+                            <option value="">-- Seleccione --</option>
+                        </select>
+                        <span asp-validation-for="DependenciaID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="ValorUnitario" class="form-label fw-semibold small text-uppercase text-secondary">Valor Total (Bs)</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light">Bs</span>
+                            <input asp-for="ValorUnitario" class="form-control text-end" placeholder="0,00" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="ObservacionesAdicionales" class="form-label fw-semibold small text-uppercase text-secondary">Observaciones Adicionales</label>
+                        <textarea asp-for="ObservacionesAdicionales" class="form-control form-control-sm" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a asp-controller="Home" asp-action="Bienes" class="btn btn-light btn-sm px-4 border text-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-dark btn-sm px-4" style="background-color: #004d26; border: none;">
+                        <i class="bi bi-save me-1"></i> Registrar Bien
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Nombre" class="control-label"></label>
-        <input asp-for="Nombre" class="form-control" />
-        <span asp-validation-for="Nombre" class="text-danger"></span>
-    </div>
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #004d26;
+        box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.1);
+    }
 
-    <div class="form-group mb-3">
-        <label asp-for="Marca" class="control-label"></label>
-        <input asp-for="Marca" class="form-control" />
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Modelo" class="control-label"></label>
-        <input asp-for="Modelo" class="form-control" />
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Serial" class="control-label"></label>
-        <input asp-for="Serial" class="form-control" />
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Color" class="control-label"></label>
-        <input asp-for="Color" class="form-control" />
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Material" class="control-label"></label>
-        <input asp-for="Material" class="form-control" />
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="ObservacionesAdicionales" class="control-label"></label>
-        <textarea asp-for="ObservacionesAdicionales" class="form-control"></textarea>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Grupo" class="control-label"></label>
-        <input asp-for="Grupo" class="form-control" />
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="DependenciaID" class="control-label"></label>
-        <select asp-for="DependenciaID" class="form-control"
-                asp-items="@(ViewBag.Departments as SelectList)">
-            <option value="">-- Seleccione Departamento --</option>
-        </select>
-        <span asp-validation-for="DependenciaID" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="ValorUnitario" class="control-label"></label>
-        <input asp-for="ValorUnitario" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-    </div>
-</form>
+    .form-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+</style>
