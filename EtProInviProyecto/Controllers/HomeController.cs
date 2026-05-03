@@ -1,4 +1,4 @@
-﻿using ETPro.Data;
+﻿using EtPro.Data;
 using EtProInviProyecto.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

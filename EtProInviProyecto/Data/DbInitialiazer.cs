@@ -1,5 +1,4 @@
 ﻿using EtPro.Models;
-using EtPro.Data;
 using Microsoft.EntityFrameworkCore;
 using EtPro.Services;
 

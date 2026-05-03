@@ -28,6 +28,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/management.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <div class="sidebar hidden">
@@ -37,7 +38,15 @@
         <nav class="nav-links">
             <a href="/Home/Dashboard" class="@(ViewContext.HttpContext.Request.Path == "/Home/Dashboard" ? "active" : "")">Dashboard</a>
             <a href="/Home/Bienes" class="@(ViewContext.HttpContext.Request.Path == "/Home/Bienes" ? "active" : "")">Bienes</a>
-        <div class="logout-container">
+            @if (User.HasClaim("Permiso", "Admin.Usuarios"))
+            {
+                <a href="/Admin" class="@(ViewContext.HttpContext.Request.Path == "/Admin" ? "active" : "")">Usuarios</a>
+            }
+            @if (User.HasClaim("Permiso", "Admin.Departamentos"))
+            {
+                <a href="/Department" class="@(ViewContext.HttpContext.Request.Path == "/Department" ? "active" : "")">Departamentos</a>
+            }
+            <div class="logout-container">
             <div class="logout-form">
                 <form asp-controller="Account" asp-action="Logout" method="post">
                     @Html.AntiForgeryToken()

@@ -1,61 +1,214 @@
 ﻿@using EtPro.Models
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-
 @model IEnumerable<User>
+
 @{
-    ViewData["Title"] = "Administración de Usuarios";
-}
-<h2>@ViewData["Title"]</h2>
+    ViewData["Title"] = "Gestión de Usuarios del Sistema";
+    Layout = "_AdminLayout"; // Asegúrate de usar tu layout administrativo
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+    string GetInitials(string name)
+    {
+        string initials = "";
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Nuevo Usuario</a>
-</p>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Usuario</th>
-            <th>Departamento</th>
-            <th>Permisos asignados</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
+        if (!string.IsNullOrEmpty(name))
         {
-            <tr>
-                <td>@user.UserName</td>
-                <td>
-                    @if (user.DepartmentID.HasValue)
-                    {
-                        var departments = (Dictionary<int, string>)ViewBag.Departments;
-                        @(departments.ContainsKey(user.DepartmentID.Value)
-                                        ? departments[user.DepartmentID.Value]
-                                        : "Desconocido")
-                    }
-                    else
-                    {
-                        <text>Sin departamento</text>
-                    }
-                </td>
-                <td>@user.ActualUserPermissions?.Count()</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@user.ID" class="btn btn-sm btn-warning">Editar</a>
-                    <a asp-action="ManagePermissions" asp-route-id="@user.ID" class="btn btn-sm btn-info">Permisos</a>
-                    @if (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != user.ID)
-                    {
-                        <form asp-action="Delete" asp-route-id="@user.ID" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este usuario?')">Eliminar</button>
-                        </form>
-                    }
-                </td>
-            </tr>
+            var words = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var word in words)
+            {
+                initials += word[0];
+            }
+            initials = initials.ToUpper();
+            if (initials.Length > 2)
+            {
+                initials = initials.Substring(0, 2);
+            }
         }
-    </tbody>
-</table>
+        return initials;
+    }
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <!-- Encabezado Formal -->
+        <div class="card-header bg-white border-bottom-0 pt-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
+                    <h4 class="mb-0 text-dark fw-bold">@ViewData["Title"]</h4>
+                </div>
+                <a asp-action="Create" class="btn btn-sm text-white px-4 shadow-sm" style="background-color: #004d26; border: none;">
+                    <i class="bi bi-person-plus-fill me-1"></i> Nuevo Usuario
+                </a>
+            </div>
+            <hr class="mt-3 mb-0" style="opacity: 0.1;">
+        </div>
+
+        <div class="card-body p-0">
+            @* P-0 para que la tabla llegue a los bordes *@
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success border-0 rounded-0 m-0 py-2 small">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table custom-inventory-table mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Usuario / Identificador</th>
+                            <th>Departamento Asignado</th>
+                            <th class="text-center">Permisos</th>
+                            <th class="text-end pe-4">Acciones de Control</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr class="row-clickable">
+                                <td class="ps-4 align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
+                                            <i class="bi bi-person text-secondary"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold d-block text-dark">@user.UserName</span>
+                                            <small class="text-muted" style="font-size: 0.7rem;">ID: @user.ID</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    @if (user.DepartmentID.HasValue)
+                                    {
+                                        var departments = (Dictionary<int, string>)ViewBag.Departments;
+                                        <span class="badge bg-light text-dark border fw-normal p-2">
+                                            <i class="bi bi-building me-1"></i>
+                                            @(departments.ContainsKey(user.DepartmentID.Value) ? departments[user.DepartmentID.Value] : "Desconocido")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted italic small">Sin departamento</span>
+                                    }
+                                </td>
+                                <td class="text-center align-middle">
+                                    <span class="badge rounded-pill @(user.ActualUserPermissions?.Count() > 0 ? "bg-info text-dark" : "bg-light text-muted border")">
+                                        @user.ActualUserPermissions?.Count() asignados
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4 align-middle">
+                                    <div class="btn-group shadow-sm">
+                                        <a asp-action="Edit" asp-route-id="@user.ID" class="btn btn-white btn-sm border" title="Editar">
+                                            <i class="bi bi-pencil text-warning"></i>
+                                        </a>
+                                        <a asp-action="ManagePermissions" asp-route-id="@user.ID" class="btn btn-white btn-sm border" title="Gestionar Permisos">
+                                            <i class="bi bi-shield-lock text-info"></i>
+                                        </a>
+
+                                        @if (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != user.ID)
+                                        {
+                                            <button type="button" class="btn btn-white btn-sm border btn-delete-user"
+                                                    data-id="@user.ID" data-name="@user.UserName" title="Eliminar">
+                                                <i class="bi bi-trash text-danger"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 py-3">
+            <small class="text-muted">Mostrando @Model.Count() usuarios registrados en el sistema.</small>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // Manejo de eliminación con SweetAlert2
+        const deleteButtons = document.querySelectorAll('.btn-delete-user');
+
+        deleteButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+        const userId = this.getAttribute('data-id');
+        const userName = this.getAttribute('data-name');
+
+        Swal.fire({
+        title: '¿Eliminar usuario?',
+        text: `Esta acción revocará todo acceso a ${userName}. No se puede deshacer.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e31e24',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar permanentemente',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+        }).then((result) => {
+        if (result.isConfirmed) {
+        // Crear un formulario temporal para enviar el POST de borrado
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/Usuarios/Delete/${userId}`;
+
+        // Añadir Anti-Forgery Token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        const tokenInput = document.createElement('input');
+        tokenInput.type = 'hidden';
+        tokenInput.name = '__RequestVerificationToken';
+        tokenInput.value = token;
+
+        form.appendChild(tokenInput);
+        document.body.appendChild(form);
+        form.submit();
+        }
+        });
+        });
+        });
+        });
+    </script>
+}
+
+<style>
+    /* Estilo de Tabla Tipo Reporte (igual a image_fcc921.png) */
+    .custom-inventory-table {
+    font-size: 0.85rem;
+    width: 100%;
+    }
+
+    .custom-inventory-table thead th {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 12px 10px;
+    border-bottom: 2px solid #dee2e6;
+    }
+
+    .custom-inventory-table tbody tr {
+    transition: background-color 0.2s ease;
+    }
+
+    .custom-inventory-table tbody tr:hover {
+    background-color: rgba(0, 77, 38, 0.03);
+    }
+
+    .btn-white {
+    background-color: #fff;
+    }
+
+    .btn-white:hover {
+    background-color: #f8f9fa;
+    }
+
+    .badge {
+    font-weight: 500;
+    }
+</style>

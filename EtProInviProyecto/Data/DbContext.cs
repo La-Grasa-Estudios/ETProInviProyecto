@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using EtPro.Models;
-using EtPro.Models;
-using EtPro.Models;
 
 namespace EtPro.Data
 {
