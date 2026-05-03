@@ -1,6 +1,6 @@
 ﻿using EtPro.Models;
 
-namespace ETPro.Models
+namespace EtPro.Models
 {
     public class TemplatePermission
     {

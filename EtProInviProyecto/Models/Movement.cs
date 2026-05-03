@@ -1,5 +1,5 @@
 ﻿// Models/Movement.cs
-using ETPro.Models;
+using EtPro.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

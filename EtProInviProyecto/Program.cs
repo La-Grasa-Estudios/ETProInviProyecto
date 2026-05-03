@@ -1,6 +1,6 @@
 ﻿using EtPro.Authorization;
-using ETPro.Data;
-using ETPro.Services;
+using EtPro.Data;
+using EtPro.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;

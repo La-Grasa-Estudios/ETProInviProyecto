@@ -1,6 +1,6 @@
 ﻿using EtPro.Models;
-using ETPro.Data;
-using ETPro.Models;
+using EtPro.Data;
+using EtPro.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -186,7 +186,7 @@ namespace EtPro.Controllers
             if (bien == null) return NotFound();
 
             var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var deptIDClaim = User.FindFirst("DepartamentoId")?.Value;
+            var deptIDClaim = User.FindFirst("DepartmentId")?.Value;
 
             bool verTodos = await _context.UserPermission
                 .AnyAsync(up => up.UserID == userID && up.Permission.Name == "Bienes.VerTodos");
@@ -322,7 +322,7 @@ namespace EtPro.Controllers
         //    if (bien == null) return NotFound();
         //
         //    var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //    var deptIDClaim = User.FindFirst("DepartamentoId")?.Value;
+        //    var deptIDClaim = User.FindFirst("DepartmentId")?.Value;
         //
         //    bool desincorporarTodos = await _context.UserPermission
         //        .AnyAsync(up => up.UserID == userID && up.Permission.Name == "Bienes.Desincorporar");

@@ -1,6 +1,6 @@
 ﻿using EtPro.Models;
 
-using ETPro.Data;
+using EtPro.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -166,7 +166,6 @@ namespace EtPro.Controllers
                 UsuarioSolicitanteId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
             };
 
-            // Asignar departamento origen desde el bien
             var bien = await _context.Bienes.FindAsync(movement.BienId);
             if (bien != null)
                 movement.OriginDepartmentId = bien.DependenciaID;
