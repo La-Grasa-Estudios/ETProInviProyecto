@@ -46,7 +46,7 @@
                                     <th class="text-uppercase small text-secondary">Solicitante</th>
                                     <th class="text-uppercase small text-secondary">Aprobador</th>
                                     <th class="text-uppercase small text-secondary">Fecha aprobación</th>
-                                    <th class="text-uppercase small text-secondary">Acciones</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,14 +68,7 @@
                                                     title="Ver historial completo del bien">
                                                 Historial del bien
                                             </button>
-                                            @if (item.Estado == "Aprobado")
-                                            {
-                                                <button class="btn-acta ms-2"
-                                                        onclick="window.location.href='@Url.Action("Acta", "Movements", new { movimientoId = item.Id })'"
-                                                        title="Ver acta">
-                                                    Acta
-                                                </button>
-                                            }
+
                                         </td>
                                     </tr>
                                 }
