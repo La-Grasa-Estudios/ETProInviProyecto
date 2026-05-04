@@ -1,55 +1,203 @@
-﻿@using EtPro.Models;
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@model IEnumerable<BienMueble>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model EtProInviProyecto.Models.BienesRegistradosViewModel;
 @{
-    ViewData["Title"] = "Inventario de Bienes";
+    Layout = "_AdminLayout";
+    ViewData["PageName"] = "Bienes Registrados";
+    ViewData["PageDescription"] = "Control y consulta de los bienes institucionales registrados en el sistema";
 }
 
-<h2>@ViewData["Title"]</h2>
+<link rel="stylesheet" href="~/css/bienes.css" asp-append-version="true" />
 
-@if (User.HasClaim("Permiso", "Bienes.Crear"))
-{
-    <p>
-        <a asp-controller="Movements" asp-action="SolicitarIncorporacion" class="btn btn-primary">Solicitar Incorporación</a>
-    </p>
-}
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.NumeroIdentificacion)</th>
-            <th>@Html.DisplayNameFor(model => model.Nombre)</th>
-            <th>@Html.DisplayNameFor(model => model.Marca)</th>
-            <th>@Html.DisplayNameFor(model => model.DependenciaID)</th>
-            <th>@Html.DisplayNameFor(model => model.ValorUnitario)</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<div class="main-container">
+    <div class="actions-container">
+        @if (User.HasClaim("Permiso", "Bienes.Crear"))
         {
-            <tr>
-                <td>@item.NumeroIdentificacion</td>
-                <td>@item.Nombre</td>
-                <td>@item.Marca</td>
-                <td>@item.DependenciaID</td>
-                <td>@item.ValorUnitario.ToString("C")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.ID" class="btn btn-sm btn-info">Detalles</a>
-                    @if (User.HasClaim("Permiso", "Bienes.Editar"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.ID" class="btn btn-sm btn-warning">Editar</a>
-                    }
-                    @if (User.HasClaim("Permiso", "Bienes.Desincorporar"))
-                    {
-                        <a asp-controller="Movements" asp-action="SolicitarDesincorporacion" class="btn btn-sm btn-danger">Solicitar Desincorporación</a>
-                    }
-                    @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
-                    {
-                        <a asp-controller="Movements" asp-action="Historial" asp-route-bienId="@item.ID" class="btn btn-sm btn-info">Historial</a>
-                    }
-                </td>
-            </tr>
+            <div class="stylized-button">
+                <button onclick="window.location.href='/Movements/SolicitarIncorporacion'">Incorporar bien</button>
+            </div>
         }
-    </tbody>
-</table>
+        @if (User.HasClaim("Permiso", "Bienes.Desincorporar"))
+        {
+            <div class="stylized-button-red btn-spaced">
+                <button onclick="window.location.href='/Movements/SolicitarDesincorporacion'">
+                    Solicitar Desincorporación
+                </button>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Movimientos.SolicitarTraspaso"))
+        {
+            <div class="stylized-button btn-spaced">
+                <button onclick="window.location.href='/Movements/SolicitarTraspaso'">
+                    Solicitar Traspaso
+                </button>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
+        {
+            <div class="stylized-button btn-spaced">
+                <button onclick="window.location.href='/Movements/HistorialTraspasos'">
+                    Historial de Traspasos
+                </button>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso") || User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion") || User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
+        {
+            <div class="dropdown btn-spaced">
+                <button class="btn-approve-dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Aprobar
+                </button>
+                <ul class="dropdown-menu">
+                    @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso"))
+                    {
+                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesTraspaso">Traspasos pendientes</a></li>
+                    }
+                    @if (User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion"))
+                    {
+                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesDesincorporacion">Desincorporaciones pendientes</a></li>
+                    }
+                    @if (User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
+                    {
+                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesIncorporacion">Incorporaciones pendientes</a></li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+    <div class="info-content">
+        <div class="inventory-stats-container green">
+            <div class="inventory-bubble"></div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalBienes</h3>
+                <span id="totalBienes" data-id="@Model.TotalBienes">Total de bienes</span>
+            </div>
+        </div>
+        <div class="inventory-stats-container white">
+            <div class="inventory-bubble"></div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalActivos</h3>
+                <span>Bienes activos</span>
+            </div>
+        </div>
+        <div class="inventory-stats-container red">
+            <div class="inventory-bubble"></div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalMantenimiento</h3>
+                <span>En traspaso</span>
+            </div>
+        </div>
+        <div class="inventory-stats-container white">
+            <div class="inventory-bubble"></div>
+            <div class="inventory-stat">
+                <h3>@Model.TotalDesincorporados</h3>
+                <span>Desincorporados</span>
+            </div>
+        </div>
+        <div class="item-container span4">
+            <div class="item-header">
+                <span><b>Filtros de búsqueda</b></span>
+            </div>
+            <div class="search-container">
+                <div class="search-filter-container">
+                    <div class="filter-container">
+                        <span><b>Grupo</b></span>
+                        <div class="input-container"></div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Subgrupo</b></span>
+                        <div class="input-container"></div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Sección</b></span>
+                        <div class="input-container"></div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Nº de identificación</b></span>
+                        <div class="input-container"></div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Nombre / Descripción</b></span>
+                        <div class="input-container input-group-text">
+                            <input placeholder="Buscar por nombre o descripción" />
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Unidad de trabajo o dependencia</b></span>
+                        <div class="input-container"></div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Responsable</b></span>
+                        <div class="input-container"></div>
+                    </div>
+                    <div class="filter-container">
+                        <span><b>Fecha de registro</b></span>
+                        <div class="input-container"></div>
+                    </div>
+                    <div class="filter-container span4 search-form">
+                        <span class="invisible">Padding</span>
+                        <div class="filter-button-container">
+                            <a><b>Limpiar Filtros</b></a>
+                            <div class="search-button">
+                                <img src="~/imagenes/search-icon.png" alt="Búsqueda" class="search-icon" />
+                                <button>Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item-container span4 table-container">
+            <div class="item-header">
+                <span><b>Listado de bienes</b></span>
+            </div>
+            <table class="custom-inventory-table">
+                <thead>
+                    <tr>
+                        <th>Grupo</th>
+                        <th>Nº de identificación</th>
+                        <th>Marca</th>
+                        <th>Nombre</th>
+                        <th>Valor Total (Bs)</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTable">
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between align-items-center mt-3 p-2 bg-white border-top">
+                <div class="text-secondary" id="infoPaginacion">
+                    Mostrando <span id="rangoInicio">0</span> a <span id="rangoFin">0</span> de <span id="totalDisplay">0</span> registros
+                </div>
+                <div class="d-flex align-items-center gap-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-secondary small">Filas por página:</span>
+                        <select id="selectResultados" class="form-select form-select-sm" style="width: 70px;" onchange="cambiarCantidad()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    <nav aria-label="Navegación">
+                        <ul class="pagination pagination-sm mb-0" id="paginacionLista">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/bienes.js"></script>
+@if (TempData["Success"] != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', () =>
+        {
+            Swal.fire({
+                title: 'Correcto',
+                text: 'Bien actualizado correctamente!',
+                icon: 'success',
+                confirmButtonText: 'Continuar',
+                theme: 'auto'
+            })
+        });
+    </script>
+}

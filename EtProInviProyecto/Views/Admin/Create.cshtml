@@ -36,6 +36,12 @@
                         <span asp-validation-for="UserName" class="text-danger small"></span>
                     </div>
 
+                    <div class="form-group mb-3">
+                        <label asp-for="FullName" class="control-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
                     <div class="col-md-6">
                         <label asp-for="DepartmentID" class="form-label fw-bold small text-uppercase text-muted">Departamento Asignado</label>
                         <select asp-for="DepartmentID" class="form-select form-select-sm"

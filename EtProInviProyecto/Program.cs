@@ -1,6 +1,9 @@
-﻿using EtPro.Authorization;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using EtPro.Authorization;
 using EtPro.Data;
 using EtPro.Services;
+using ETPro.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +25,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
-
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+builder.Services.AddScoped<PdfService>();
 
 // ─── Autorización personalizada ───
 builder.Services.AddHttpContextAccessor();

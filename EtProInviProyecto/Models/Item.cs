@@ -42,7 +42,6 @@ public class BienMueble
     public bool Activo { get; set; } = true;
     public bool Aprobado { get; set; } = false;
 
-
     [NotMapped]
     public string DescripcionBM1
     {

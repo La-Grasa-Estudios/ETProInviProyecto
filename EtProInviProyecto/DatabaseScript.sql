@@ -4,6 +4,7 @@ USE GestionBienesETProDB;
 CREATE TABLE IF NOT EXISTS Users (
     ID VARCHAR(450) PRIMARY KEY,
     UserName VARCHAR(100) NOT NULL UNIQUE,
+    FullName VARCHAR(150) NULL,
     PasswordHash TEXT NOT NULL,
     DepartmentID INT NULL
 );

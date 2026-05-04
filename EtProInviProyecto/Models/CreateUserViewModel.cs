@@ -8,6 +8,10 @@ namespace EtPro.Models
         [Display(Name = "Usuario")]
         public string UserName { get; set; }
 
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [Display(Name = "Nombre del usuario")]
+        public string FullName { get; set; }
+
         [Required(ErrorMessage = "La contraseña es obligatoria")]
         [DataType(DataType.Password)]
         [Display(Name = "Contraseña")]

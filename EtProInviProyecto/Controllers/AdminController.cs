@@ -58,6 +58,7 @@ namespace EtPro.Controllers
             var user = new User
             {
                 UserName = model.UserName,
+                FullName = model.FullName,   
                 PasswordHash = PasswordHashingService.HashPassword(model.Password),
                 DepartmentID = model.DepartmentID
             };
@@ -80,6 +81,7 @@ namespace EtPro.Controllers
             {
                 ID = user.ID,
                 UserName = user.UserName,
+                FullName = user.FullName,
                 DepartmentID = user.DepartmentID
             });
         }
@@ -105,6 +107,7 @@ namespace EtPro.Controllers
             }
 
             user.UserName = model.UserName;
+            user.FullName = model.FullName;
             user.DepartmentID = model.DepartmentID;
 
             if (!string.IsNullOrEmpty(model.NewPassword))

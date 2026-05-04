@@ -1,60 +1,107 @@
 ﻿@using EtPro.Models;
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-
 @model IEnumerable<Movement>
 @{
     ViewData["Title"] = "Traspasos Pendientes";
+    Layout = null;
 }
 
-<h2>@ViewData["Title"]</h2>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gestión de Bienes</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bienes.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-3">
+                <div class="d-flex align-items-center">
+                    <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
+                    <h4 class="mb-0 text-dark fw-bold">@ViewData["Title"]</h4>
+                </div>
+                <hr class="mt-3 mb-0" style="opacity: 0.1;">
+            </div>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+            <div class="card-body p-4">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success small">@TempData["Success"]</div>
+                }
 
-@if (!Model.Any())
-{
-    <p>No hay solicitudes de traspaso pendientes.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Bien</th>
-                <th>Origen</th>
-                <th>Destino</th>
-                <th>Solicitante</th>
-                <th>Fecha solicitud</th>
-                <th>Motivo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Bien?.Nombre (@item.Bien?.NumeroIdentificacion)</td>
-                    <td>@item.OriginDepartment?.Name</td>
-                    <td>@item.DestinationDepartment?.Name</td>
-                    <td>@item.UsuarioSolicitante?.UserName</td>
-                    <td>@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@item.Motivo</td>
-                    <td>
-                        <form asp-action="AprobarTraspaso" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@item.Id" />
-                            <button type="submit" class="btn btn-sm btn-success">Aprobar</button>
-                        </form>
-                        <form asp-action="RechazarTraspaso" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@item.Id" />
-                            <button type="submit" class="btn btn-sm btn-danger">Rechazar</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+                @if (!Model.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        <p>No hay solicitudes de traspaso pendientes.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-uppercase small text-secondary">Bien</th>
+                                    <th class="text-uppercase small text-secondary">Origen</th>
+                                    <th class="text-uppercase small text-secondary">Destino</th>
+                                    <th class="text-uppercase small text-secondary">Solicitante</th>
+                                    <th class="text-uppercase small text-secondary">Fecha solicitud</th>
+                                    <th class="text-uppercase small text-secondary">Motivo</th>
+                                    <th class="text-uppercase small text-secondary">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold">@item.Bien?.NumeroIdentificacion</span><br />
+                                            <small class="text-muted">@item.Bien?.Nombre</small>
+                                        </td>
+                                        <td>@item.OriginDepartment?.Name</td>
+                                        <td>@item.DestinationDepartment?.Name</td>
+                                        <td>@item.UsuarioSolicitante?.UserName</td>
+                                        <td class="text-nowrap">@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@item.Motivo</td>
+                                        <td class="text-nowrap">
+                                            <form asp-action="AprobarTraspaso" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn-historial">
+                                                    Aprobar
+                                                </button>
+                                            </form>
+                                            <form asp-action="RechazarTraspaso" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn-rechazar ms-2">
+                                                    Rechazar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a href="javascript:history.back()" class="btn btn-light btn-sm px-4 border text-secondary">Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-control:focus, .form-select:focus {
+            border-color: #004d26;
+            box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.1);
+        }
+    </style>
+</body>
+</html>

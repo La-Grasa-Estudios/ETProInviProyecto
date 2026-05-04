@@ -10,6 +10,10 @@ namespace EtPro.Models
         [Display(Name = "Usuario")]
         public string UserName { get; set; }
 
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [Display(Name = "Nombre del usuario")]
+        public string FullName { get; set; }
+
         [Display(Name = "Departamento")]
         public int? DepartmentID { get; set; }
 

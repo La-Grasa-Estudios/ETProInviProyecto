@@ -1,4 +1,6 @@
-﻿@model EtProInviProyecto.Models.BienesRegistradosViewModel;
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model EtProInviProyecto.Models.BienesRegistradosViewModel;
 @{
     Layout = "_AdminLayout";
     ViewData["PageName"] = "Bienes Registrados";
@@ -12,14 +14,73 @@
         @if (User.HasClaim("Permiso", "Bienes.Crear"))
         {
             <div class="stylized-button">
-            <button onclick="window.location.href='/Bienes/Create'">Registrar bien</button>
+                <button onclick="window.location.href='/Movements/SolicitarIncorporacion'">Incorporar bien</button>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Bienes.Desincorporar"))
+        {
+            <div class="stylized-button-red btn-spaced">
+                <button onclick="window.location.href='/Movements/SolicitarDesincorporacion'">
+                    Solicitar Desincorporación
+                </button>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Movimientos.SolicitarTraspaso"))
+        {
+            <div class="stylized-button btn-spaced">
+                <button onclick="window.location.href='/Movements/SolicitarTraspaso'">
+                    Solicitar Traspaso
+                </button>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
+        {
+            <div class="stylized-button btn-spaced">
+                <button onclick="window.location.href='/Movements/HistorialTraspasos'">
+                    Historial de Traspasos
+                </button>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso") || User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion") || User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
+        {
+            <div class="dropdown btn-spaced">
+                <button class="btn-approve-dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Aprobar
+                </button>
+                <ul class="dropdown-menu">
+                    @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso"))
+                    {
+                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesTraspaso">Traspasos pendientes</a></li>
+                    }
+                    @if (User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion"))
+                    {
+                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesDesincorporacion">Desincorporaciones pendientes</a></li>
+                    }
+                    @if (User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
+                    {
+                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesIncorporacion">Incorporaciones pendientes</a></li>
+                    }
+                </ul>
+            </div>
+        }
+        @if (User.HasClaim("Permiso", "Reportes.VerPropios") || User.HasClaim("Permiso", "Reportes.VerTodos"))
+        {
+            <div class="dropdown btn-spaced">
+                <button class="btn-approve-dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Reportes
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="InventarioPorDepartamento">Inventario por Departamento</a></li>
+                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="Movimientos">Movimientos</a></li>
+                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="BienesDesincorporados">Bienes Desincorporados</a></li>
+                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="EstadoInventario">Estado del Inventario</a></li>
+                </ul>
             </div>
         }
     </div>
     <div class="info-content">
         <div class="inventory-stats-container green">
             <div class="inventory-bubble">
-
             </div>
             <div class="inventory-stat">
                 <h3>@Model.TotalBienes</h3>
@@ -125,7 +186,6 @@
                     </tr>
                 </thead>
                 <tbody id="inventoryTable">
-                    
                 </tbody>
             </table>
             <div class="d-flex justify-content-between align-items-center mt-3 p-2 bg-white border-top">

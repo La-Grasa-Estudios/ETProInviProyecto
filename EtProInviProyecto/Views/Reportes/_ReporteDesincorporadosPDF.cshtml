@@ -1,0 +1,73 @@
+﻿@model EtPro.Models.ReporteDesincorporadosViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Bienes Desincorporados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .header {
+            border-bottom: 2px solid #e31e24;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 100px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: #004d26;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img class="logo" src="@ViewBag.LogoPath" alt="Logo" />
+        <h1>Reporte de Bienes Desincorporados</h1>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Nº Identificación</th>
+                <th>Nombre</th>
+                <th>Marca</th>
+                <th>Departamento</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bien in Model.Bienes)
+            {
+                <tr>
+                    <td>@bien.NumeroIdentificacion</td>
+                    <td>@bien.Nombre</td>
+                    <td>@bien.Marca</td>
+                    <td>@bien.DependenciaID</td>
+                    <td>@bien.ValorUnitario.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

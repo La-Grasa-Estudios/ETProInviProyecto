@@ -1,0 +1,101 @@
+﻿@using EtPro.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<BienMueble>
+@{
+    ViewData["Title"] = "Reporte de Bienes Desincorporados";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gestión de Bienes</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bienes.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-3">
+                <div class="d-flex align-items-center">
+                    <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
+                    <h4 class="mb-0 text-dark fw-bold">@ViewData["Title"]</h4>
+                </div>
+                <hr class="mt-3 mb-0" style="opacity: 0.1;">
+            </div>
+
+            <div class="card-body p-4">
+                <form method="post">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-uppercase text-secondary">Desde</label>
+                            <input type="date" name="desde" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-uppercase text-secondary">Hasta</label>
+                            <input type="date" name="hasta" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-uppercase text-secondary">Modo</label>
+                            <select name="modo" class="form-select form-select-sm">
+                                <option value="vista">Ver en pantalla</option>
+                                <option value="pdf">Descargar PDF</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a href="javascript:history.back()" class="btn btn-light btn-sm px-4 border text-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-dark btn-sm px-4" style="background-color: #004d26; border: none;">
+                            <i class="bi bi-funnel"></i> Generar
+                        </button>
+                    </div>
+                </form>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive mt-4">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-uppercase small text-secondary">Nº Identificación</th>
+                                    <th class="text-uppercase small text-secondary">Nombre</th>
+                                    <th class="text-uppercase small text-secondary">Marca</th>
+                                    <th class="text-uppercase small text-secondary">Departamento</th>
+                                    <th class="text-uppercase small text-secondary">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var b in Model)
+                                {
+                                    <tr>
+                                        <td>@b.NumeroIdentificacion</td>
+                                        <td>@b.Nombre</td>
+                                        <td>@b.Marca</td>
+                                        <td>@b.DependenciaID</td>
+                                        <td>@b.ValorUnitario.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="mt-4 text-muted text-center py-3">No se encontraron bienes desincorporados con los filtros seleccionados.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-control:focus, .form-select:focus {
+            border-color: #004d26;
+            box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.1);
+        }
+    </style>
+</body>
+</html>

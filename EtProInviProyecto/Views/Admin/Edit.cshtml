@@ -9,7 +9,6 @@
 
 <div class="container mt-4">
     <div class="card shadow-sm border-0" style="max-width: 800px; margin: auto;">
-        <!-- Encabezado Institucional -->
         <div class="card-header bg-white border-bottom-0 pt-3">
             <div class="d-flex align-items-center">
                 <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
@@ -27,7 +26,7 @@
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small border-0 mb-4"></div>
 
                 <div class="row g-3">
-                    <!-- Información de Cuenta -->
+                    <!-- Nombre de Usuario -->
                     <div class="col-md-6">
                         <label asp-for="UserName" class="form-label fw-bold small text-uppercase text-muted">Nombre de Usuario</label>
                         <div class="input-group input-group-sm">
@@ -37,6 +36,17 @@
                         <span asp-validation-for="UserName" class="text-danger small"></span>
                     </div>
 
+                    <!-- Nombre Completo (Nuevo) -->
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label fw-bold small text-uppercase text-muted">Nombre Completo</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-fill"></i></span>
+                            <input asp-for="FullName" class="form-control border-start-0" />
+                        </div>
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Departamento -->
                     <div class="col-md-6">
                         <label asp-for="DepartmentID" class="form-label fw-bold small text-uppercase text-muted">Departamento</label>
                         <select asp-for="DepartmentID" class="form-select form-select-sm"
@@ -45,6 +55,9 @@
                         </select>
                         <span asp-validation-for="DepartmentID" class="text-danger small"></span>
                     </div>
+
+                    <!-- La columna restante queda vacía, pero podemos agregar algo o simplemente cerrar la fila -->
+                    <div class="col-md-6"></div>
 
                     <hr class="my-4 text-muted opacity-25">
 
@@ -66,7 +79,6 @@
                     </div>
                 </div>
 
-                <!-- Footer de Acciones -->
                 <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
                     <a asp-action="Index" class="btn btn-sm btn-light border px-4">
                         <i class="bi bi-x-circle me-1"></i> Cancelar
@@ -86,58 +98,58 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('editUserForm');
+            const form = document.getElementById('editUserForm');
 
-        form.addEventListener('submit', function (e) {
-        if (!form.checkValidity()) {
-        return;
-        }
+            form.addEventListener('submit', function (e) {
+                if (!form.checkValidity()) {
+                    return;
+                }
 
-        e.preventDefault();
+                e.preventDefault();
 
-        Swal.fire({
-        title: '¿Confirmar cambios?',
-        text: "Se actualizará la información del usuario en la base de datos.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#004d26',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, actualizar',
-        cancelButtonText: 'Cancelar',
-        reverseButtons: true
-        }).then((result) => {
-        if (result.isConfirmed) {
-        Swal.fire({
-        title: 'Procesando...',
-        allowOutsideClick: false,
-        didOpen: () => {
-        Swal.showLoading();
-        }
-        });
-        form.submit();
-        }
-        });
-        });
+                Swal.fire({
+                    title: '¿Confirmar cambios?',
+                    text: "Se actualizará la información del usuario en la base de datos.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#004d26',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, actualizar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Procesando...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        form.submit();
+                    }
+                });
+            });
         });
     </script>
 
     <style>
         body {
-        background-color: #f4f6f9;
+            background-color: #f4f6f9;
         }
 
         .form-label {
-        font-size: 0.75rem;
-        margin-bottom: 0.4rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.4rem;
         }
 
         .form-control:focus, .form-select:focus {
-        border-color: #004d26;
-        box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.15);
+            border-color: #004d26;
+            box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.15);
         }
 
         .input-group-text {
-        color: #6c757d;
+            color: #6c757d;
         }
     </style>
 }

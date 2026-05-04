@@ -80,7 +80,7 @@
                         <span class="profile-initials">@initials</span>
                     </div>
                     <div class="profile-name">
-                        <span><b>@(User.Identity != null ? User.Identity.Name : "Desconocido")</b></span>
+                        <span><b>@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</b></span>
                         <span>Unidad de bienes</span>
                     </div>
                 </div>

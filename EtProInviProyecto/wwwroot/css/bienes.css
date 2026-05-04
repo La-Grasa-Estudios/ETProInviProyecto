@@ -272,3 +272,102 @@
 .row-clickable:hover {
     background-color: rgba(0, 77, 38, 0.05) !important;
 }
+
+.stylized-button-red {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+    .stylized-button-red button {
+        background-color: #dc3545 !important;
+        border: 1px solid #dc3545 !important;
+        color: white !important;
+        padding: 8px 20px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+        .stylized-button-red button:hover {
+            background-color: #c82333 !important;
+        }
+
+
+.btn-spaced {
+    margin-left: 20px;
+}
+
+.stylized-button-red {
+    display: inline-block;
+}
+
+.btn-historial {
+    background-color: #004d26 !important;
+    border: 1px solid #004d26 !important;
+    color: white !important;
+    padding: 8px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-historial:hover {
+        background-color: #003a1f !important;
+    }
+
+.btn-acta {
+    background-color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+    color: white !important;
+    padding: 8px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-acta:hover {
+        background-color: #c82333 !important;
+    }
+
+.btn-approve-dropdown {
+    background-color: #004d26 !important;
+    border: 1px solid #004d26 !important;
+    color: white !important;
+    padding: 8px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-approve-dropdown:hover {
+        background-color: #003a1f !important;
+    }
+
+.btn-rechazar {
+    background-color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+    color: white !important;
+    padding: 8px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-desincorporar:hover {
+        background-color: #c82333 !important;
+    }
+
+.dropdown-menu {
+    z-index: 1050; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 1px solid #dee2e6;
+}
+
+.actions-container {
+    margin-bottom: 10px; 
+}

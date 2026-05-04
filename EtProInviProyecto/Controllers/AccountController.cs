@@ -49,6 +49,7 @@ namespace EtPro.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.ID),
                 new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("FullName", user.FullName),
                 new Claim("DepartmentId", user.DepartmentID?.ToString() ?? "")
             };
 

@@ -1,6 +1,5 @@
 ﻿using EtPro.Models;
 using EtPro.Data;
-using EtPro.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -20,20 +19,32 @@ namespace EtPro.Controllers
         }
 
         [Route("/api/Lista")]
-        [AllowAnonymous]
         [HttpPost]
+        [PermissionAuthorize("Bienes.VerPropios")]
         public async Task<IActionResult> Lista(int pagina = 1, int resultadosPorPagina = 10)
         {
             resultadosPorPagina = Math.Min(resultadosPorPagina, 20);
             pagina = Math.Max(pagina, 1);
 
-            var query = _context.Bienes.AsQueryable();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var deptClaim = User.FindFirst("DepartmentId")?.Value;
+
+            var query = _context.Bienes.Where(b => b.Activo && b.Aprobado);
+
+            if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
+            {
+                if (int.TryParse(deptClaim, out int deptId))
+                    query = query.Where(b => b.DependenciaID == deptId);
+                else
+                    return Json(new { total = 0, items = Array.Empty<object>() });
+            }
+
             int total = await query.CountAsync();
             var items = await query
-            .OrderBy(b => b.ID)
-            .Skip((pagina - 1) * resultadosPorPagina)
-            .Take(resultadosPorPagina)
-            .ToListAsync();
+                .OrderBy(b => b.ID)
+                .Skip((pagina - 1) * resultadosPorPagina)
+                .Take(resultadosPorPagina)
+                .ToListAsync();
 
             return Json(items);
         }
@@ -152,8 +163,8 @@ namespace EtPro.Controllers
                 Grupo = model.Grupo,
                 DependenciaID = model.DependenciaID,
                 ValorUnitario = model.ValorUnitario,
-                Activo = true,       
-                Aprobado = false     
+                Activo = true,
+                Aprobado = false
             };
 
             _context.Bienes.Add(nuevoBien);
@@ -167,7 +178,7 @@ namespace EtPro.Controllers
                 FechaSolicitud = DateTime.UtcNow,
                 Estado = "Pendiente",
                 UsuarioSolicitanteId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-                Motivo = "Incorporación de nuevo bien"  
+                Motivo = "Incorporación de nuevo bien"
             };
 
             _context.Movements.Add(movimiento);
@@ -196,11 +207,11 @@ namespace EtPro.Controllers
                 if (int.TryParse(deptIDClaim, out int deptID))
                 {
                     if (bien.DependenciaID != deptID)
-                        return Forbid();   
+                        return Forbid();
                 }
                 else
                 {
-                    return Forbid();      
+                    return Forbid();
                 }
             }
 
@@ -252,7 +263,7 @@ namespace EtPro.Controllers
                 }
                 else
                 {
-                    return Forbid(); 
+                    return Forbid();
                 }
             }
 
@@ -313,48 +324,5 @@ namespace EtPro.Controllers
             return View(bienEditado);
         }
 
-        //[PermissionAuthorize("Bienes.Desincorporar")]
-        //public async Task<IActionResult> Delete(int? ID)
-        //{
-        //    if (ID == null) return NotFound();
-        //
-        //    var bien = await _context.Bienes.FindAsync(ID);
-        //    if (bien == null) return NotFound();
-        //
-        //    var userID = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //    var deptIDClaim = User.FindFirst("DepartmentId")?.Value;
-        //
-        //    bool desincorporarTodos = await _context.UserPermission
-        //        .AnyAsync(up => up.UserID == userID && up.Permission.Name == "Bienes.Desincorporar");
-        //
-        //    if (!desincorporarTodos)
-        //    {
-        //        if (int.TryParse(deptIDClaim, out int deptID))
-        //        {
-        //            if (bien.DependenciaID != deptID)
-        //                return Forbid();
-        //        }
-        //        else
-        //        {
-        //            return Forbid();
-        //        }
-        //    }
-        //
-        //    return View(bien);
-        //}
-        //
-        //[HttpPost, ActionName("Delete")]
-        //[PermissionAuthorize("Bienes.Desincorporar")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int ID)
-        //{
-        //    var bien = await _context.Bienes.FindAsync(ID);
-        //    if (bien != null)
-        //    {
-        //        _context.Bienes.Remove(bien);
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    return RedirectToAction(nameof(Index));
-        //}
     }
 }

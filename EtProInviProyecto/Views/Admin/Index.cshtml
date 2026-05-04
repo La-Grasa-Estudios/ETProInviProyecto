@@ -4,7 +4,7 @@
 
 @{
     ViewData["Title"] = "Gestión de Usuarios del Sistema";
-    Layout = "_AdminLayout"; // Asegúrate de usar tu layout administrativo
+    Layout = "_AdminLayout";
 
     string GetInitials(string name)
     {
@@ -30,7 +30,6 @@
 
 <div class="container mt-4">
     <div class="card shadow-sm border-0">
-        <!-- Encabezado Formal -->
         <div class="card-header bg-white border-bottom-0 pt-3">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
@@ -45,8 +44,6 @@
         </div>
 
         <div class="card-body p-0">
-            @* P-0 para que la tabla llegue a los bordes *@
-
             @if (TempData["Success"] != null)
             {
                 <div class="alert alert-success border-0 rounded-0 m-0 py-2 small">
@@ -58,7 +55,7 @@
                 <table class="table custom-inventory-table mb-0">
                     <thead>
                         <tr>
-                            <th class="ps-4">Usuario / Identificador</th>
+                            <th class="ps-4">Usuario</th>
                             <th>Departamento Asignado</th>
                             <th class="text-center">Permisos</th>
                             <th class="text-end pe-4">Acciones de Control</th>
@@ -71,11 +68,11 @@
                                 <td class="ps-4 align-middle">
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px;">
-                                            <i class="bi bi-person text-secondary"></i>
+                                            <span class="text-secondary small fw-bold">@GetInitials(user.FullName ?? user.UserName)</span>
                                         </div>
                                         <div>
-                                            <span class="fw-bold d-block text-dark">@user.UserName</span>
-                                            <small class="text-muted" style="font-size: 0.7rem;">ID: @user.ID</small>
+                                            <span class="fw-bold d-block text-dark">@(user.FullName ?? user.UserName)</span>
+                                            <small class="text-muted" style="font-size: 0.7rem;">@user.UserName</small>
                                         </div>
                                     </div>
                                 </td>
@@ -110,7 +107,7 @@
                                         @if (User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != user.ID)
                                         {
                                             <button type="button" class="btn btn-white btn-sm border btn-delete-user"
-                                                    data-id="@user.ID" data-name="@user.UserName" title="Eliminar">
+                                                    data-id="@user.ID" data-name="@user.FullName" title="Eliminar">
                                                 <i class="bi bi-trash text-danger"></i>
                                             </button>
                                         }
@@ -132,83 +129,79 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Manejo de eliminación con SweetAlert2
-        const deleteButtons = document.querySelectorAll('.btn-delete-user');
+            const deleteButtons = document.querySelectorAll('.btn-delete-user');
 
-        deleteButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-        const userId = this.getAttribute('data-id');
-        const userName = this.getAttribute('data-name');
+            deleteButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    const userName = this.getAttribute('data-name');
 
-        Swal.fire({
-        title: '¿Eliminar usuario?',
-        text: `Esta acción revocará todo acceso a ${userName}. No se puede deshacer.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#e31e24',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, eliminar permanentemente',
-        cancelButtonText: 'Cancelar',
-        reverseButtons: true
-        }).then((result) => {
-        if (result.isConfirmed) {
-        // Crear un formulario temporal para enviar el POST de borrado
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/Usuarios/Delete/${userId}`;
+                    Swal.fire({
+                        title: '¿Eliminar usuario?',
+                        text: `Esta acción revocará todo acceso a ${userName}. No se puede deshacer.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#e31e24',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, eliminar permanentemente',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = '/Admin/Delete/' + userId;
 
-        // Añadir Anti-Forgery Token
-        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-        const tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = '__RequestVerificationToken';
-        tokenInput.value = token;
+                            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                            const tokenInput = document.createElement('input');
+                            tokenInput.type = 'hidden';
+                            tokenInput.name = '__RequestVerificationToken';
+                            tokenInput.value = token;
 
-        form.appendChild(tokenInput);
-        document.body.appendChild(form);
-        form.submit();
-        }
-        });
-        });
-        });
+                            form.appendChild(tokenInput);
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
+                });
+            });
         });
     </script>
 }
 
 <style>
-    /* Estilo de Tabla Tipo Reporte (igual a image_fcc921.png) */
     .custom-inventory-table {
-    font-size: 0.85rem;
-    width: 100%;
+        font-size: 0.85rem;
+        width: 100%;
     }
 
-    .custom-inventory-table thead th {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    padding: 12px 10px;
-    border-bottom: 2px solid #dee2e6;
-    }
+        .custom-inventory-table thead th {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 12px 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
 
-    .custom-inventory-table tbody tr {
-    transition: background-color 0.2s ease;
-    }
+        .custom-inventory-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
 
-    .custom-inventory-table tbody tr:hover {
-    background-color: rgba(0, 77, 38, 0.03);
-    }
+            .custom-inventory-table tbody tr:hover {
+                background-color: rgba(0, 77, 38, 0.03);
+            }
 
     .btn-white {
-    background-color: #fff;
+        background-color: #fff;
     }
 
-    .btn-white:hover {
-    background-color: #f8f9fa;
-    }
+        .btn-white:hover {
+            background-color: #f8f9fa;
+        }
 
     .badge {
-    font-weight: 500;
+        font-weight: 500;
     }
 </style>

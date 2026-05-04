@@ -108,6 +108,7 @@ namespace EtPro.Data
                 {
                     ID = Guid.NewGuid().ToString(),
                     UserName = "superadmin",
+                    FullName = "superadmin",
                     PasswordHash = PasswordHashingService.HashPassword("superadmin"),
                     DepartmentID = null
                 };

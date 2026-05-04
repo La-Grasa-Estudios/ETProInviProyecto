@@ -288,7 +288,8 @@ namespace EtPro.Controllers
 
             if (movimiento.Bien != null)
             {
-                _context.Bienes.Remove(movimiento.Bien);
+                movimiento.Bien.Activo = false;
+                _context.Bienes.Update(movimiento.Bien);
             }
 
             movimiento.Estado = "Rechazado";

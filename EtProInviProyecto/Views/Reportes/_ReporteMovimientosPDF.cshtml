@@ -1,0 +1,87 @@
+﻿@model EtPro.Models.ReporteMovimientosViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Movimientos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .header {
+            border-bottom: 2px solid #e31e24;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 100px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: #004d26;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .estado-aprobado {
+            color: green;
+            font-weight: bold;
+        }
+
+        .estado-rechazado {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img class="logo" src="@ViewBag.LogoPath" alt="Logo" />
+        <h1>Reporte de Movimientos</h1>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Bien</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Solicitante</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mov in Model.Movimientos)
+            {
+                <tr>
+                    <td>@mov.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@mov.Type</td>
+                    <td>@mov.Bien?.NumeroIdentificacion - @mov.Bien?.Nombre</td>
+                    <td>@mov.OriginDepartment?.Name</td>
+                    <td>@mov.DestinationDepartment?.Name</td>
+                    <td>@mov.UsuarioSolicitante?.UserName</td>
+                    <td class="@(mov.Estado == "Aprobado" ? "estado-aprobado" : mov.Estado == "Rechazado" ? "estado-rechazado" : "")">@mov.Estado</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
