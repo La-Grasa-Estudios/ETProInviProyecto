@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS BienesMuebles (
     Material VARCHAR(50) NULL,
     ObservacionesAdicionales VARCHAR(150) NULL,
     Grupo INT NOT NULL DEFAULT 2,
+    Subgrupo VARCHAR(10) NULL,
+    Seccion VARCHAR(10) NULL,
     DependenciaID INT NOT NULL,
     ValorUnitario DECIMAL(18,2) NOT NULL,
     Activo TINYINT(1) NOT NULL DEFAULT 1,
@@ -61,10 +63,13 @@ CREATE TABLE IF NOT EXISTS Departments (
     Name VARCHAR(100) NOT NULL,
     ManagerId VARCHAR(450) NULL,
     CustodianId VARCHAR(450) NULL,
+    ParentDepartmentID INT NULL,
     CONSTRAINT FK_Departments_Manager FOREIGN KEY (ManagerId) REFERENCES Users(ID)
         ON DELETE SET NULL,
     CONSTRAINT FK_Departments_Custodian FOREIGN KEY (CustodianId) REFERENCES Users(ID)
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+    CONSTRAINT FK_Departments_Parent FOREIGN KEY (ParentDepartmentID) 
+        REFERENCES Departments(ID) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS Movements (

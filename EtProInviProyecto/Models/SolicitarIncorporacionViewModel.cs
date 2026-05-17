@@ -20,6 +20,12 @@ namespace EtPro.Models
         [MaxLength(50)] public string? Material { get; set; }
         [MaxLength(150)] public string? ObservacionesAdicionales { get; set; }
 
+        [MaxLength(10)]
+        public string? Subgrupo { get; set; }
+
+        [MaxLength(10)]
+        public string? Seccion { get; set; }
+
         public int Grupo { get; set; } = 2;
 
         [Required(ErrorMessage = "Debe seleccionar un departamento")]

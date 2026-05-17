@@ -70,6 +70,16 @@
                         <input asp-for="Grupo" class="form-control form-control-sm" />
                     </div>
 
+                    <!-- Nuevos campos de clasificación -->
+                    <div class="col-md-2">
+                        <label asp-for="Subgrupo" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Subgrupo" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="Seccion" class="form-label fw-bold small text-uppercase text-muted"></label>
+                        <input asp-for="Seccion" class="form-control form-control-sm" />
+                    </div>
+
                     <div class="col-md-4">
                         <label asp-for="DependenciaID" class="form-label fw-bold small text-uppercase text-muted">Departamento Asignado</label>
                         <select asp-for="DependenciaID" class="form-select form-select-sm"
@@ -148,32 +158,32 @@
 
 <style>
     body {
-    background-color: #f4f6f9;
+        background-color: #f4f6f9;
     }
 
     .card {
-    border-radius: 12px;
+        border-radius: 12px;
     }
 
     .form-label {
-    margin-bottom: 0.3rem;
-    font-size: 0.7rem;
+        margin-bottom: 0.3rem;
+        font-size: 0.7rem;
     }
 
     .form-control:focus, .form-select:focus {
-    border-color: #004d26;
-    box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.15);
+        border-color: #004d26;
+        box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.15);
     }
 
     .input-group-text {
-    font-size: 0.8rem;
-    color: #6c757d;
+        font-size: 0.8rem;
+        color: #6c757d;
     }
 
     /* Estilo para inputs de solo lectura */
     input[readonly] {
-    background-color: #fdfdfd !important;
-    border-style: dashed;
-    color: #495057;
+        background-color: #fdfdfd !important;
+        border-style: dashed;
+        color: #495057;
     }
 </style>

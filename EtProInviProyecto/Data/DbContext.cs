@@ -62,6 +62,7 @@ namespace EtPro.Data
 
             });
             builder.Entity<BienMueble>().Property(b => b.DependenciaID).HasColumnName("DependenciaID");
+            builder.Entity<BienMueble>().HasIndex(b => b.NumeroIdentificacion).IsUnique();
 
             builder.Entity<Department>()
                 .HasOne(d => d.Manager)
@@ -73,6 +74,12 @@ namespace EtPro.Data
                 .WithMany()
                 .HasForeignKey(d => d.CustodianID)
                 .IsRequired(false);
+
+            builder.Entity<Department>()
+                .HasOne(d => d.ParentDepartment)
+                .WithMany(d => d.ChildDepartments)
+                .HasForeignKey(d => d.ParentDepartmentID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Movement>()
                 .HasOne(m => m.Bien)

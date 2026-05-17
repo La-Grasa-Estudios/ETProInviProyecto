@@ -34,6 +34,12 @@ public class BienMueble
     public string? ObservacionesAdicionales { get; set; }
 
     public int Grupo { get; set; } = 2;
+
+    [MaxLength(10)]
+    public string? Subgrupo { get; set; }
+
+    [MaxLength(10)]
+    public string? Seccion { get; set; }
     public int DependenciaID { get; set; }
 
     [Column(TypeName = "decimal(18, 2)")]

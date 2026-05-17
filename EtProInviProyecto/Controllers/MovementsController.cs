@@ -69,12 +69,34 @@ namespace EtPro.Controllers
             ViewBag.Bienes = new SelectList(bienes, "ID", "NumeroIdentificacion", bienIdSeleccionado);
         }
 
+
+
         [HttpGet]
         [PermissionAuthorize("Bienes.Crear")]
         public IActionResult SolicitarIncorporacion()
         {
             ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name");
-            return View(new SolicitarIncorporacionViewModel());
+
+            string ultimoCodigo = _context.Bienes
+                .Where(b => b.NumeroIdentificacion.StartsWith("ET-"))
+                .OrderByDescending(b => b.NumeroIdentificacion)
+                .Select(b => b.NumeroIdentificacion)
+                .FirstOrDefault();
+
+            string siguienteCodigo = "ET-00001";
+            if (!string.IsNullOrEmpty(ultimoCodigo))
+            {
+                string parteNumerica = ultimoCodigo.Replace("ET-", "");
+                if (int.TryParse(parteNumerica, out int numero))
+                    siguienteCodigo = $"ET-{(numero + 1).ToString("D5")}";
+            }
+
+            var model = new SolicitarIncorporacionViewModel
+            {
+                NumeroIdentificacion = siguienteCodigo
+            };
+
+            return View(model);
         }
 
         [HttpGet]
@@ -151,7 +173,7 @@ namespace EtPro.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await CargarDropdownsTraspaso();
+                await CargarDropdownsTraspaso(model.BienId, model.DestinationDepartmentId);
                 return View(model);
             }
 
@@ -177,14 +199,6 @@ namespace EtPro.Controllers
             return RedirectToAction(nameof(SolicitarTraspaso));
         }
 
-        [HttpGet]
-        [PermissionAuthorize("Bienes.Desincorporar")]
-        public async Task<IActionResult> SolicitarDesincorporacion()
-        {
-            await CargarDropdownsDesincorporacion();
-            return View(new SolicitarDesincorporacionViewModel());
-        }
-
         [HttpPost]
         [PermissionAuthorize("Bienes.Crear")]
         [ValidateAntiForgeryToken]
@@ -195,6 +209,16 @@ namespace EtPro.Controllers
                 ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name");
                 return View(model);
             }
+
+            bool codigoExiste = await _context.Bienes.AnyAsync(b => b.NumeroIdentificacion == model.NumeroIdentificacion);
+            if (codigoExiste)
+            {
+                ModelState.AddModelError(nameof(model.NumeroIdentificacion), "Este número de identificación ya existe. Debe ser único.");
+                ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name");
+                return View(model);
+            }
+
+            bool registroDirecto = User.HasClaim("Permiso", "Bienes.RegistroDirecto");
 
             var nuevoBien = new BienMueble
             {
@@ -210,28 +234,43 @@ namespace EtPro.Controllers
                 DependenciaID = model.DependenciaID,
                 ValorUnitario = model.ValorUnitario,
                 Activo = true,
-                Aprobado = false
+                Subgrupo = model.Subgrupo,
+                Seccion = model.Seccion,
+                Aprobado = registroDirecto  
             };
 
             _context.Bienes.Add(nuevoBien);
             await _context.SaveChangesAsync();
 
-            var movement = new Movement
+            var movimiento = new Movement
             {
                 BienId = nuevoBien.ID,
                 Type = MovementType.Incorporacion,
                 OriginDepartmentId = nuevoBien.DependenciaID,
-                Motivo = "Solicitud de incorporación",
+                Motivo = registroDirecto ? "Registro directo" : "Solicitud de incorporación",
                 FechaSolicitud = DateTime.UtcNow,
-                Estado = "Pendiente",
-                UsuarioSolicitanteId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                Estado = registroDirecto ? "Aprobado" : "Pendiente",
+                UsuarioSolicitanteId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+                UsuarioAprobadorId = registroDirecto ? User.FindFirst(ClaimTypes.NameIdentifier)?.Value : null,
+                FechaAprobacion = registroDirecto ? DateTime.UtcNow : null
             };
 
-            _context.Movements.Add(movement);
+            _context.Movements.Add(movimiento);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Solicitud de incorporación enviada. Pendiente de aprobación.";
+            TempData["Success"] = registroDirecto
+                ? "Bien incorporado exitosamente"
+                : "Solicitud de incorporación registrada. El bien está pendiente de aprobación.";
+
             return RedirectToAction(nameof(SolicitarIncorporacion));
+        }
+
+        [HttpGet]
+        [PermissionAuthorize("Bienes.Desincorporar")]
+        public async Task<IActionResult> SolicitarDesincorporacion()
+        {
+            await CargarDropdownsDesincorporacion();
+            return View(new SolicitarDesincorporacionViewModel());
         }
 
         [HttpGet]
@@ -488,7 +527,7 @@ namespace EtPro.Controllers
         }
 
         [HttpGet]
-        [PermissionAuthorize("Historial.VerPropios")] 
+        [PermissionAuthorize("Actas.Imprimir")] 
         public async Task<IActionResult> Acta(int movimientoId)
         {
             var movimiento = await _context.Movements

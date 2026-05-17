@@ -18,6 +18,19 @@ namespace EtPro.Controllers
             _context = context;
         }
 
+        private async Task<List<int>> ObtenerDepartamentosVisiblesAsync(string deptClaim)
+        {
+            if (int.TryParse(deptClaim, out int deptId))
+            {
+                var ids = await _context.Departments
+                    .Where(d => d.ID == deptId || d.ParentDepartmentID == deptId)
+                    .Select(d => d.ID)
+                    .ToListAsync();
+                return ids;
+            }
+            return new List<int>();
+        }
+
         [Route("/api/Lista")]
         [HttpPost]
         [PermissionAuthorize("Bienes.VerPropios")]
@@ -33,8 +46,9 @@ namespace EtPro.Controllers
 
             if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
             {
-                if (int.TryParse(deptClaim, out int deptId))
-                    query = query.Where(b => b.DependenciaID == deptId);
+                var deptosVisibles = await ObtenerDepartamentosVisiblesAsync(deptClaim);
+                if (deptosVisibles.Any())
+                    query = query.Where(b => deptosVisibles.Contains(b.DependenciaID));
                 else
                     return Json(new { total = 0, items = Array.Empty<object>() });
             }
@@ -59,14 +73,53 @@ namespace EtPro.Controllers
 
             if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
             {
-                if (int.TryParse(deptIdClaim, out int deptId))
-                    query = query.Where(b => b.DependenciaID == deptId);
+                var deptosVisibles = await ObtenerDepartamentosVisiblesAsync(deptIdClaim);
+                if (deptosVisibles.Any())
+                    query = query.Where(b => deptosVisibles.Contains(b.DependenciaID));
                 else
                     return Forbid();
             }
 
             var bienes = await query.ToListAsync();
             return View(bienes);
+        }
+
+        [HttpGet]
+        [PermissionAuthorize("Bienes.VerPropios")]
+        public async Task<IActionResult> ObtenerDatosBien(int id)
+        {
+            var bien = await _context.Bienes.FindAsync(id);
+            if (bien == null)
+                return NotFound();
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var deptClaim = User.FindFirst("DepartmentId")?.Value;
+
+            if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
+            {
+                var deptosVisibles = await ObtenerDepartamentosVisiblesAsync(deptClaim);
+                if (!deptosVisibles.Contains(bien.DependenciaID))
+                    return Forbid();
+            }
+
+            var departamento = await _context.Departments.FindAsync(bien.DependenciaID);
+
+            var datos = new
+            {
+                bien.ID,
+                bien.NumeroIdentificacion,
+                bien.Nombre,
+                bien.Marca,
+                bien.Modelo,
+                bien.Serial,
+                bien.Color,
+                bien.Material,
+                bien.ValorUnitario,
+                Departamento = departamento?.Name,
+                Estado = bien.Activo ? "Activo" : "Inactivo"
+            };
+
+            return Json(datos);
         }
 
         [HttpGet]
@@ -136,7 +189,27 @@ namespace EtPro.Controllers
         public IActionResult SolicitarIncorporacion()
         {
             ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name");
-            return View(new SolicitarIncorporacionViewModel());
+
+            string ultimoCodigo = _context.Bienes
+                .Where(b => b.NumeroIdentificacion.StartsWith("ET-"))
+                .OrderByDescending(b => b.NumeroIdentificacion)
+                .Select(b => b.NumeroIdentificacion)
+                .FirstOrDefault();
+
+            string siguienteCodigo = "ET-00001";
+            if (!string.IsNullOrEmpty(ultimoCodigo))
+            {
+                string parteNumerica = ultimoCodigo.Replace("ET-", "");
+                if (int.TryParse(parteNumerica, out int numero))
+                    siguienteCodigo = $"ET-{(numero + 1).ToString("D5")}";
+            }
+
+            var model = new SolicitarIncorporacionViewModel
+            {
+                NumeroIdentificacion = siguienteCodigo
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -149,6 +222,15 @@ namespace EtPro.Controllers
                 ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name");
                 return View(model);
             }
+
+            bool codigoExiste = await _context.Bienes.AnyAsync(b => b.NumeroIdentificacion == model.NumeroIdentificacion);
+            if (codigoExiste)
+            {
+                ModelState.AddModelError(nameof(model.NumeroIdentificacion), "Este número de identificación ya existe. Debe ser único.");
+                ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name");
+                return View(model);
+            }
+
 
             var nuevoBien = new BienMueble
             {
@@ -204,15 +286,9 @@ namespace EtPro.Controllers
 
             if (!verTodos)
             {
-                if (int.TryParse(deptIDClaim, out int deptID))
-                {
-                    if (bien.DependenciaID != deptID)
-                        return Forbid();
-                }
-                else
-                {
+                var deptosVisibles = await ObtenerDepartamentosVisiblesAsync(deptIDClaim);
+                if (!deptosVisibles.Contains(bien.DependenciaID))
                     return Forbid();
-                }
             }
 
             return View(bien);
@@ -274,7 +350,7 @@ namespace EtPro.Controllers
         [HttpPost]
         [PermissionAuthorize("Bienes.Editar")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,NumeroIdentificacion,Nombre,Marca,Modelo,Serial,Color,Material,ObservacionesAdicionales,Grupo,DependenciaID,ValorUnitario")] BienMueble bienEditado)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,NumeroIdentificacion,Nombre,Marca,Modelo,Serial,Color,Material,ObservacionesAdicionales,Grupo,Subgrupo,Seccion,DependenciaID,ValorUnitario")] BienMueble bienEditado)
         {
             if (id != bienEditado.ID) return NotFound();
 
@@ -291,7 +367,8 @@ namespace EtPro.Controllers
             {
                 if (int.TryParse(deptIdClaim, out int deptId))
                 {
-                    if (bienOriginal.DependenciaID != deptId) return Forbid();
+                    if (bienOriginal.DependenciaID != deptId)
+                        return Forbid();
                 }
                 else
                 {

@@ -13,6 +13,8 @@ namespace EtPro.Data
             ("Bienes.Crear", "Registrar nuevos bienes", "Bienes"),
             ("Bienes.Editar", "Editar información de bienes", "Bienes"),
             ("Bienes.Desincorporar", "Solicitar desincorporación de bienes", "Bienes"),
+            ("Bienes.RegistroDirecto", "Registrar bienes directamente sin aprobación", "Bienes"),
+            ("Actas.Imprimir", "Imprimir actas de historial", "Bienes"),
             ("Movimientos.SolicitarTraspaso", "Solicitar traspaso de bienes", "Movimientos"),
             ("Movimientos.AprobarTraspaso", "Aprobar o rechazar solicitudes de traspaso", "Movimientos"),
             ("Movimientos.AprobarDesincorporacion", "Aprobar o rechazar desincorporaciones", "Movimientos"),
@@ -27,7 +29,7 @@ namespace EtPro.Data
             ("Etiquetas.Generar", "Generar e imprimir etiquetas", "Etiquetas"),
             ("Etiquetas.Ignorar", "Ignorar alerta de etiquetas desactualizadas", "Etiquetas"),
             ("Inventario.Verificar", "Recibir notificación para verificar inventario", "Inventario"),
-            ("Inventario.Confirmar", "Confirmar verificación de inventario", "Inventario")
+            ("Inventario.Confirmar", "Confirmar verificación de inventario", "Inventario"),
         };
 
         public static async Task InitializeAsync(AppDbContext context)
@@ -54,13 +56,15 @@ namespace EtPro.Data
                 var adminPermissions = new[]
                 {
                     "Bienes.VerTodos", "Bienes.Crear", "Bienes.Editar",
+                    "Bienes.RegistroDirecto",   
                     "Movimientos.AprobarTraspaso", "Movimientos.AprobarDesincorporacion",
-                    "Movimientos.AprobarIncorporacion",  
+                    "Movimientos.AprobarIncorporacion",
                     "Historial.VerTodos", "Reportes.VerTodos",
                     "Etiquetas.Generar", "Etiquetas.Ignorar", "Inventario.Confirmar",
-                    "Bienes.VerPropios", "Historial.VerPropios", "Reportes.VerPropios"
+                    "Bienes.VerPropios", "Historial.VerPropios", "Reportes.VerPropios",
+                    "Actas.Imprimir"   
                 };
-                
+
                 var admin = new TemplatePermission { Name = "Administrador de Bienes", Description = "Gestión total de bienes y aprobaciones" };
                 admin.Details = all.Where(p => adminPermissions.Contains(p.Name))
                                    .Select(p => new TemplatePermissionDetails { PermissionInstance = p }).ToList();

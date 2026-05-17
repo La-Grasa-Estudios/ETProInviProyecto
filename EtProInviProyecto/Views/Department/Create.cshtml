@@ -9,7 +9,6 @@
 
 <div class="container mt-4">
     <div class="card shadow-sm border-0" style="max-width: 700px; margin: auto;">
-        <!-- Encabezado Institucional -->
         <div class="card-header bg-white border-bottom-0 pt-4">
             <div class="d-flex align-items-center">
                 <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
@@ -34,6 +33,15 @@
                             <input asp-for="Name" class="form-control border-start-0" placeholder="Ej: Operaciones, TI, RRHH..." required />
                         </div>
                         <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Departamento Padre -->
+                    <div class="col-12">
+                        <label asp-for="ParentDepartmentID" class="form-label fw-bold small text-uppercase text-muted">Departamento Padre</label>
+                        <select asp-for="ParentDepartmentID" class="form-select form-select-sm"
+                                asp-items="@(ViewBag.ParentDepartments as SelectList)">
+                            <option value="">-- Ninguno (es una gerencia principal) --</option>
+                        </select>
                     </div>
 
                     <!-- Responsable (Manager) -->
@@ -61,7 +69,6 @@
                     </div>
                 </div>
 
-                <!-- Footer de Acciones -->
                 <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
                     <a asp-action="Index" class="btn btn-sm btn-light border px-4">
                         <i class="bi bi-arrow-left me-1"></i> Volver
@@ -84,11 +91,7 @@
         const form = document.getElementById('createDeptForm');
 
         form.addEventListener('submit', function (e) {
-        // Si la validación nativa de HTML5 falla, dejamos que el navegador actúe
-        if (!form.checkValidity()) {
-        return;
-        }
-
+        if (!form.checkValidity()) { return; }
         e.preventDefault();
 
         Swal.fire({
@@ -106,9 +109,7 @@
         Swal.fire({
         title: 'Guardando...',
         allowOutsideClick: false,
-        didOpen: () => {
-        Swal.showLoading();
-        }
+        didOpen: () => { Swal.showLoading(); }
         });
         form.submit();
         }
@@ -119,21 +120,21 @@
 
     <style>
         body {
-        background-color: #f4f6f9;
+            background-color: #f4f6f9;
         }
 
         .form-label {
-        font-size: 0.75rem;
-        margin-bottom: 0.4rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.4rem;
         }
 
         .form-control:focus, .form-select:focus {
-        border-color: #004d26;
-        box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.15);
+            border-color: #004d26;
+            box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.15);
         }
 
         .input-group-text {
-        color: #6c757d;
+            color: #6c757d;
         }
     </style>
 }

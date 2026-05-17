@@ -14,6 +14,7 @@
     <title>@ViewData["Title"] - Gestión de Bienes</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bienes.css" asp-append-version="true" />
 </head>
 <body>
     <div class="container mt-4">
@@ -48,11 +49,45 @@
                     <div class="row g-3">
                         <div class="col-md-8">
                             <label asp-for="BienId" class="form-label fw-semibold small text-uppercase text-secondary">Bien a desincorporar</label>
-                            <select asp-for="BienId" class="form-select form-select-sm"
+                            <select asp-for="BienId" class="form-select form-select-sm" id="bienSelect"
                                     asp-items="@(ViewBag.Bienes as SelectList)">
                                 <option value="">-- Seleccione un bien --</option>
                             </select>
                             <span asp-validation-for="BienId" class="text-danger small"></span>
+                            <!-- Contenedor de información del bien (inicialmente oculto) -->
+                            <div id="bienInfoContainer" class="mt-3" style="display: none;">
+                                <div class="card border-light shadow-sm">
+                                    <div class="card-body p-3">
+                                        <h6 class="fw-bold text-secondary text-uppercase small">Información del bien seleccionado</h6>
+                                        <table class="table table-sm table-borderless mb-0" style="font-size: 0.85rem;">
+                                            <tr>
+                                                <th class="ps-0 text-muted" style="width: 40%;">Código:</th>
+                                                <td id="bienCodigo"></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 text-muted">Nombre:</th>
+                                                <td id="bienNombre"></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 text-muted">Marca:</th>
+                                                <td id="bienMarca"></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 text-muted">Modelo:</th>
+                                                <td id="bienModelo"></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 text-muted">Departamento actual:</th>
+                                                <td id="bienDepartamento"></td>
+                                            </tr>
+                                            <tr>
+                                                <th class="ps-0 text-muted">Estado:</th>
+                                                <td id="bienEstado"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-12">
@@ -72,6 +107,45 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bienSelect = document.getElementById('bienSelect');
+            const infoContainer = document.getElementById('bienInfoContainer');
+            const codigo = document.getElementById('bienCodigo');
+            const nombre = document.getElementById('bienNombre');
+            const marca = document.getElementById('bienMarca');
+            const modelo = document.getElementById('bienModelo');
+            const departamento = document.getElementById('bienDepartamento');
+            const estado = document.getElementById('bienEstado');
+
+            bienSelect.addEventListener('change', async function () {
+                const bienId = this.value;
+                if (!bienId) {
+                    infoContainer.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/Bienes/ObtenerDatosBien/${bienId}`);
+                    if (!response.ok) {
+                        throw new Error('Error al obtener los datos del bien.');
+                    }
+                    const data = await response.json();
+                    codigo.textContent = data.numeroIdentificacion || '-';
+                    nombre.textContent = data.nombre || '-';
+                    marca.textContent = data.marca || '-';
+                    modelo.textContent = data.modelo || '-';
+                    departamento.textContent = data.departamento || '-';
+                    estado.textContent = data.estado || '-';
+                    infoContainer.style.display = 'block';
+                } catch (error) {
+                    console.error(error);
+                    infoContainer.style.display = 'none';
+                }
+            });
+        });
+    </script>
 
     <style>
         .form-control:focus, .form-select:focus {

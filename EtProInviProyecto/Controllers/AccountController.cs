@@ -60,6 +60,20 @@ namespace EtPro.Controllers
 
             claims.AddRange(permissions.Select(p => new Claim("Permiso", p)));
 
+            string role = "Usuario";
+            if (permissions.Contains("Admin.Usuarios"))
+                role = "Superadmin";
+            else if (permissions.Contains("Movimientos.AprobarTraspaso"))
+                role = "Administrador de Bienes";
+            else if (permissions.Contains("Bienes.Editar"))
+                role = "Gerente / Responsable";
+            else if (permissions.Contains("Inventario.Verificar"))
+                role = "Custodio";
+            else if (permissions.Contains("Reportes.VerTodos"))
+                role = "Auditor";
+
+            claims.Add(new Claim("Role", role));
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
@@ -73,6 +87,39 @@ namespace EtPro.Controllers
                 });
 
             return RedirectToLocal(returnUrl);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            if (!PasswordHashingService.VerifyPassword(model.CurrentPassword, user.PasswordHash))
+            {
+                ModelState.AddModelError(nameof(model.CurrentPassword), "La contraseña actual es incorrecta.");
+                return View(model);
+            }
+
+            user.PasswordHash = PasswordHashingService.HashPassword(model.NewPassword);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Contraseña cambiada exitosamente.";
+            return RedirectToAction(nameof(ChangePassword));
         }
 
         [HttpPost]

@@ -16,5 +16,9 @@ namespace EtPro.Models
 
         public string? CustodianID { get; set; }
         public User? Custodian { get; set; }
+
+        public int? ParentDepartmentID { get; set; }
+        public Department? ParentDepartment { get; set; }
+        public ICollection<Department> ChildDepartments { get; set; } = new List<Department>();
     }
 }

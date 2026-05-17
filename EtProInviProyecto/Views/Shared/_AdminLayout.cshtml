@@ -31,6 +31,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
+
+    <span>Rol: @User.FindFirst("Role")?.Value</span>
+
     <div class="sidebar hidden">
         <div class="sidebar-header">
             <img src="~/imagenes/logo.jpg" alt="Ingaturronña" class="logo" />
@@ -46,21 +49,22 @@
             {
                 <a href="/Department" class="@(ViewContext.HttpContext.Request.Path == "/Department" ? "active" : "")">Departamentos</a>
             }
+            <a href="/Account/ChangePassword" class="@(ViewContext.HttpContext.Request.Path == "/Account/ChangePassword" ? "active" : "")">Cambiar contraseña</a>
             <div class="logout-container">
-            <div class="logout-form">
-                <form asp-controller="Account" asp-action="Logout" method="post">
-                    @Html.AntiForgeryToken()
-                    <button type="submit">Cerrar sesión</button>
-                </form>
+                <div class="logout-form">
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit">Cerrar sesión</button>
+                    </form>
+                </div>
             </div>
-        </div>
-        <button onclick="toggleSidebar()" class="sidebar-toggle-button"></button>
+            <button onclick="toggleSidebar()" class="sidebar-toggle-button"></button>
     </div>
     <div class="main-content">
         <div class="management-header">
-                <div class="header-logo">
-                    <img src="~/imagenes/logo.jpg" alt="Ingaturronña" class="logo" />
-                </div>
+            <div class="header-logo">
+                <img src="~/imagenes/logo.jpg" alt="Ingaturronña" class="logo" />
+            </div>
             <div class="page-name group-vertical">
                 <h2><b>@ViewData["PageName"]</b></h2>
                 <a><b>@ViewData["PageDescription"]</b></a>
@@ -81,7 +85,7 @@
                     </div>
                     <div class="profile-name">
                         <span><b>@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</b></span>
-                        <span>Unidad de bienes</span>
+                        <span>@(User.FindFirst("Role")?.Value ?? "Usuario")</span>
                     </div>
                 </div>
             </div>

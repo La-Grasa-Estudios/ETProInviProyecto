@@ -48,7 +48,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label asp-for="NumeroIdentificacion" class="form-label fw-semibold small text-uppercase text-secondary">Nº de Identificación</label>
-                            <input asp-for="NumeroIdentificacion" class="form-control form-control-sm" placeholder="Ej: ET-00000" />
+                            <input asp-for="NumeroIdentificacion" class="form-control form-control-sm" readonly="readonly" />
                             <span asp-validation-for="NumeroIdentificacion" class="text-danger small"></span>
                         </div>
 
@@ -86,6 +86,16 @@
                         <div class="col-md-2">
                             <label asp-for="Grupo" class="form-label fw-semibold small text-uppercase text-secondary"></label>
                             <input asp-for="Grupo" class="form-control form-control-sm" />
+                        </div>
+
+                        <!-- Nuevos campos de clasificación -->
+                        <div class="col-md-2">
+                            <label asp-for="Subgrupo" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                            <input asp-for="Subgrupo" class="form-control form-control-sm" />
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="Seccion" class="form-label fw-semibold small text-uppercase text-secondary"></label>
+                            <input asp-for="Seccion" class="form-control form-control-sm" />
                         </div>
 
                         <div class="col-md-3">

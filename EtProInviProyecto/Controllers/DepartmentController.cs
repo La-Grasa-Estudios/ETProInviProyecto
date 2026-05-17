@@ -23,6 +23,7 @@ namespace EtPro.Controllers
             var departments = await _context.Departments
                 .Include(d => d.Manager)
                 .Include(d => d.Custodian)
+                .Include(d => d.ParentDepartment)
                 .ToListAsync();
             return View(departments);
         }
@@ -34,22 +35,21 @@ namespace EtPro.Controllers
                 .Where(up => up.Permission.Name == "Bienes.VerPropios")
                 .Select(up => up.UserID)
                 .Distinct();
-
             var managers = _context.Users
                 .Where(u => managerIds.Contains(u.ID))
                 .ToList();
+            ViewBag.Managers = new SelectList(managers, "ID", "UserName");
 
             var custodianIds = _context.UserPermission
                 .Where(up => up.Permission.Name == "Inventario.Verificar")
                 .Select(up => up.UserID)
                 .Distinct();
-
             var custodians = _context.Users
                 .Where(u => custodianIds.Contains(u.ID))
                 .ToList();
-
-            ViewBag.Managers = new SelectList(managers, "ID", "UserName");
             ViewBag.Custodians = new SelectList(custodians, "ID", "UserName");
+
+            ViewBag.ParentDepartments = new SelectList(_context.Departments, "ID", "Name");
 
             return View();
         }
@@ -65,6 +65,27 @@ namespace EtPro.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            var managerIds = _context.UserPermission
+                .Where(up => up.Permission.Name == "Bienes.VerPropios")
+                .Select(up => up.UserID)
+                .Distinct();
+            var managers = _context.Users
+                .Where(u => managerIds.Contains(u.ID))
+                .ToList();
+            ViewBag.Managers = new SelectList(managers, "ID", "UserName");
+
+            var custodianIds = _context.UserPermission
+                .Where(up => up.Permission.Name == "Inventario.Verificar")
+                .Select(up => up.UserID)
+                .Distinct();
+            var custodians = _context.Users
+                .Where(u => custodianIds.Contains(u.ID))
+                .ToList();
+            ViewBag.Custodians = new SelectList(custodians, "ID", "UserName");
+
+            ViewBag.ParentDepartments = new SelectList(_context.Departments, "ID", "Name");
+
             return View(department);
         }
 
@@ -82,7 +103,9 @@ namespace EtPro.Controllers
             var managers = await _context.Users
                 .Where(u => managerIds.Contains(u.ID))
                 .ToListAsync();
+            ViewBag.Managers = new SelectList(managers, "ID", "UserName");
 
+            
             var custodianIds = _context.UserPermission
                 .Where(up => up.Permission.Name == "Inventario.Verificar")
                 .Select(up => up.UserID)
@@ -90,9 +113,10 @@ namespace EtPro.Controllers
             var custodians = await _context.Users
                 .Where(u => custodianIds.Contains(u.ID))
                 .ToListAsync();
-
-            ViewBag.Managers = new SelectList(managers, "ID", "UserName");
             ViewBag.Custodians = new SelectList(custodians, "ID", "UserName");
+
+            var allDepts = await _context.Departments.Where(d => d.ID != ID).ToListAsync();
+            ViewBag.ParentDepartments = new SelectList(allDepts, "ID", "Name", department.ParentDepartmentID);
 
             return View(department);
         }
@@ -118,6 +142,28 @@ namespace EtPro.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            var managerIds = _context.UserPermission
+                .Where(up => up.Permission.Name == "Bienes.VerPropios")
+                .Select(up => up.UserID)
+                .Distinct();
+            var managers = await _context.Users
+                .Where(u => managerIds.Contains(u.ID))
+                .ToListAsync();
+            ViewBag.Managers = new SelectList(managers, "ID", "UserName");
+
+            var custodianIds = _context.UserPermission
+                .Where(up => up.Permission.Name == "Inventario.Verificar")
+                .Select(up => up.UserID)
+                .Distinct();
+            var custodians = await _context.Users
+                .Where(u => custodianIds.Contains(u.ID))
+                .ToListAsync();
+            ViewBag.Custodians = new SelectList(custodians, "ID", "UserName");
+
+            var allDepts = await _context.Departments.Where(d => d.ID != ID).ToListAsync();
+            ViewBag.ParentDepartments = new SelectList(allDepts, "ID", "Name", department.ParentDepartmentID);
+
             return View(department);
         }
 
@@ -138,6 +184,14 @@ namespace EtPro.Controllers
             var department = await _context.Departments.FindAsync(ID);
             if (department != null)
             {
+                var childDepartments = await _context.Departments
+                    .Where(d => d.ParentDepartmentID == ID)
+                    .ToListAsync();
+                foreach (var child in childDepartments)
+                {
+                    child.ParentDepartmentID = null;
+                }
+
                 _context.Departments.Remove(department);
                 await _context.SaveChangesAsync();
             }

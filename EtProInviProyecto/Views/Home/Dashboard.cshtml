@@ -1,12 +1,14 @@
 ﻿@model EtProInviProyecto.Models.BienesRegistradosViewModel;
 @{
     Layout = "_AdminLayout";
-    ViewData["PageName"] = "Dashboard";
+    ViewData["PageName"] = "Inicio"; 
     ViewData["PageDescription"] = "Resumen general del inventario";
 }
 <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+
 <div class="dashboard-container">
     <div class="info-container">
+
         <div class="dashboard-info" style="background-color: green;">
             <div class="dashboard-icon">
                 <div class="dashboard-icon-bg"></div>
@@ -56,6 +58,53 @@
                 <h6>Bienes dados de baja</h6>
             </div>
         </div>
+
+        <!-- Tarjeta de Solicitudes Pendientes (solo si tiene permisos de aprobación) -->
+        @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso") ||
+                User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion") ||
+                User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
+        {
+            <div class="dashboard-info" style="background-color: #f39c12; color: white;">
+                <div class="dashboard-icon">
+                    <div class="dashboard-icon-bg"></div>
+                </div>
+                <div class="dashboard-data">
+                    <h5 class="dashboard-info-title">Solicitudes pendientes</h5>
+                    <h1 class="dashboard-number">@Model.SolicitudesPendientes</h1>
+                    <h6>Por aprobar</h6>
+                </div>
+            </div>
+        }
+
+        @if (Model.CustodiosACargo > 0 && User.HasClaim("Permiso", "Bienes.Editar") && !User.HasClaim("Permiso", "Admin.Usuarios"))
+        {
+            <div class="dashboard-info" style="background-color: #007bff; color: white;">
+                <div class="dashboard-icon">
+                    <div class="dashboard-icon-bg"></div>
+                </div>
+                <div class="dashboard-data">
+                    <h5 class="dashboard-info-title">Custodios a mi cargo</h5>
+                    <h1 class="dashboard-number">@Model.CustodiosACargo</h1>
+                    <h6>Responsables de inventario</h6>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.GerenteEncargado) && User.HasClaim("Permiso", "Inventario.Verificar") && !User.HasClaim("Permiso", "Admin.Usuarios"))
+        {
+            <div class="dashboard-info" style="background-color: #6c757d; color: white;">
+                <div class="dashboard-icon">
+                    <div class="dashboard-icon-bg"></div>
+                </div>
+                <div class="dashboard-data">
+                    <h5 class="dashboard-info-title">Mi Gerente</h5>
+                    <h1 class="dashboard-number" style="font-size: 1.5rem;">@Model.GerenteEncargado</h1>
+                    <h6>Supervisor directo</h6>
+                </div>
+            </div>
+        }
+
+        <!-- Gráfico de estado del inventario (existente) -->
         <div class="graph-container">
             <div class="graph-header">
                 <span><b>Estado del Inventario</b></span>
@@ -87,61 +136,56 @@
                 </div>
             </div>
         </div>
-        <div class="search-container">
-            <h4><b>Búsqueda Rápida</b></h4>
-            <h6>Encuentra bienes utilizando diferentes criterios de búsqueda</h6>
-            <div class="search-filter-container">
-                <div class="filter-container">
-                    <span><b>Código del bien</b></span>
-                    <div class="input-container">
-                        <input placeholder="Ej: BI-0001234" />
-                    </div>
+
+        <!-- Movimientos Recientes (si existen) -->
+        @if (Model.MovimientosRecientes != null && Model.MovimientosRecientes.Any())
+        {
+            <div class="graph-container" style="margin-top: 20px;">
+                <div class="graph-header">
+                    <span><b>Últimos Movimientos</b></span>
                 </div>
-                <div class="filter-container">
-                    <span><b>Nombre del bien</b></span>
-                    <div class="input-container">
-                        <input placeholder="Ej: Computadora" />
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <span><b>Departamento</b></span>
-                    <div class="input-container">
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <span><b>Estado</b></span>
-                    <div class="input-container">
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <span><b>Responsable</b></span>
-                    <div class="input-container">
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <span><b>Ubicación</b></span>
-                    <div class="input-container">
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <span><b>Tipo de bien</b></span>
-                    <div class="input-container">
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <span class="invisible">Padding</span>
-                    <div class="filter-button-container">
-                        <a><b>Limpiar Filtros</b></a>
-                        <div class="search-button">
-                            <img src="~/imagenes/search-icon.png" alt="Búsqueda" class="search-icon" />
-                            <button>Buscar</button>
-                        </div>
-                    </div>
+                <div class="card-body">
+                    <table class="custom-inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Bien</th>
+                                <th>Origen</th>
+                                <th>Destino</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var mov in Model.MovimientosRecientes)
+                            {
+                                <tr>
+                                    <td>@mov.FechaAprobacion?.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@mov.Type</td>
+                                    <td>@mov.Bien?.NumeroIdentificacion</td>
+                                    <td>@mov.OriginDepartment?.Name</td>
+                                    <td>@mov.DestinationDepartment?.Name</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="graph-container" style="margin-top: 20px;">
+                <div class="graph-header">
+                    <span><b>Últimos Movimientos</b></span>
+                </div>
+                <div class="card-body text-center py-3 text-muted">
+                    No hay movimientos recientes.
+                </div>
+            </div>
+        }
+
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('inventoryChart').getContext('2d');
