@@ -55,7 +55,8 @@ CREATE TABLE IF NOT EXISTS BienesMuebles (
     DependenciaID INT NOT NULL,
     ValorUnitario DECIMAL(18,2) NOT NULL,
     Activo TINYINT(1) NOT NULL DEFAULT 1,
-    Aprobado TINYINT(1) NOT NULL DEFAULT 0   
+    Aprobado TINYINT(1) NOT NULL DEFAULT 0,
+    FechaRegistro DATETIME NULL
 );
 
 CREATE TABLE IF NOT EXISTS Departments (

@@ -236,6 +236,7 @@ namespace EtPro.Controllers
                 Activo = true,
                 Subgrupo = model.Subgrupo,
                 Seccion = model.Seccion,
+                FechaRegistro = DateTime.UtcNow,
                 Aprobado = registroDirecto  
             };
 

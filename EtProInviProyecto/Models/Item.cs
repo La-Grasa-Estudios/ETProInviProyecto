@@ -47,6 +47,7 @@ public class BienMueble
 
     public bool Activo { get; set; } = true;
     public bool Aprobado { get; set; } = false;
+    public DateTime? FechaRegistro { get; set; }
 
     [NotMapped]
     public string DescripcionBM1

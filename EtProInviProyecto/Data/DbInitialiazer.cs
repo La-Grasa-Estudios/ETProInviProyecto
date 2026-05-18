@@ -152,7 +152,8 @@ namespace EtPro.Data
                     Grupo = 2,
                     ObservacionesAdicionales = "Asignada al superadmin",
                     Aprobado = true,
-                    Activo = true
+                    Activo = true,
+                    FechaRegistro = DateTime.Now
                 });
                 context.SaveChanges();
             }

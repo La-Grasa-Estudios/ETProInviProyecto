@@ -31,10 +31,35 @@ namespace EtPro.Controllers
             return new List<int>();
         }
 
+        private async Task<List<int>> ObtenerDepartamentosVisiblesIdsAsync(string deptClaim)
+        {
+            if (int.TryParse(deptClaim, out int deptId))
+            {
+                return await _context.Departments
+                    .Where(d => d.ID == deptId || d.ParentDepartmentID == deptId)
+                    .Select(d => d.ID)
+                    .ToListAsync();
+            }
+            return new List<int>();
+        }
+
+
         [Route("/api/Lista")]
         [HttpPost]
         [PermissionAuthorize("Bienes.VerPropios")]
-        public async Task<IActionResult> Lista(int pagina = 1, int resultadosPorPagina = 10)
+        public async Task<IActionResult> Lista(
+            int pagina = 1,
+            int resultadosPorPagina = 10,
+            string? codigo = null,
+            string? descripcion = null,
+            int? departamentoId = null,
+            bool? activo = null,
+            string? grupo = null,
+            string? subgrupo = null,
+            string? seccion = null,
+            string? responsableId = null,
+            DateTime? fechaDesde = null,
+            DateTime? fechaHasta = null)
         {
             resultadosPorPagina = Math.Min(resultadosPorPagina, 20);
             pagina = Math.Max(pagina, 1);
@@ -44,13 +69,60 @@ namespace EtPro.Controllers
 
             var query = _context.Bienes.Where(b => b.Activo && b.Aprobado);
 
+            List<int> deptosVisibles = new List<int>();
             if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
             {
-                var deptosVisibles = await ObtenerDepartamentosVisiblesAsync(deptClaim);
+                deptosVisibles = await ObtenerDepartamentosVisiblesAsync(deptClaim);
                 if (deptosVisibles.Any())
                     query = query.Where(b => deptosVisibles.Contains(b.DependenciaID));
                 else
                     return Json(new { total = 0, items = Array.Empty<object>() });
+            }
+            else
+            {
+                deptosVisibles = await _context.Departments.Select(d => d.ID).ToListAsync();
+            }
+
+            if (!string.IsNullOrWhiteSpace(codigo))
+                query = query.Where(b => b.NumeroIdentificacion.Contains(codigo));
+            if (!string.IsNullOrWhiteSpace(descripcion))
+                query = query.Where(b => b.Nombre.Contains(descripcion) || b.Marca.Contains(descripcion) || b.ObservacionesAdicionales.Contains(descripcion));
+            if (!string.IsNullOrWhiteSpace(grupo))
+                query = query.Where(b => b.Grupo.ToString().Contains(grupo));
+            if (!string.IsNullOrWhiteSpace(subgrupo))
+                query = query.Where(b => b.Subgrupo.Contains(subgrupo));
+            if (!string.IsNullOrWhiteSpace(seccion))
+                query = query.Where(b => b.Seccion.Contains(seccion));
+
+            if (!string.IsNullOrWhiteSpace(responsableId))
+            {
+                var deptosDelResponsable = await _context.Departments
+                    .Where(d => d.ManagerID == responsableId && deptosVisibles.Contains(d.ID))
+                    .Select(d => d.ID)
+                    .ToListAsync();
+                if (deptosDelResponsable.Any())
+                    query = query.Where(b => deptosDelResponsable.Contains(b.DependenciaID));
+                else
+                    query = query.Where(b => false);
+            }
+
+            if (departamentoId.HasValue)
+            {
+                if (!deptosVisibles.Contains(departamentoId.Value))
+                    departamentoId = null; // ignorar si no es visible
+                else
+                    query = query.Where(b => b.DependenciaID == departamentoId.Value);
+            }
+
+            if (activo.HasValue)
+                query = query.Where(b => b.Activo == activo.Value);
+
+            if (fechaDesde.HasValue)
+                query = query.Where(b => b.FechaRegistro >= fechaDesde.Value);
+            if (fechaHasta.HasValue)
+            {
+                DateTime fechaHastaAjustada = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
+                query = query.Where(b => b.FechaRegistro <= fechaHastaAjustada);
             }
 
             int total = await query.CountAsync();
@@ -60,8 +132,9 @@ namespace EtPro.Controllers
                 .Take(resultadosPorPagina)
                 .ToListAsync();
 
-            return Json(items);
+            return Json(new { total, items });
         }
+
 
         [PermissionAuthorize("Bienes.VerPropios")]
         public async Task<IActionResult> Index()
@@ -246,7 +319,8 @@ namespace EtPro.Controllers
                 DependenciaID = model.DependenciaID,
                 ValorUnitario = model.ValorUnitario,
                 Activo = true,
-                Aprobado = false
+                Aprobado = false,
+                FechaRegistro = DateTime.UtcNow
             };
 
             _context.Bienes.Add(nuevoBien);
@@ -328,14 +402,22 @@ namespace EtPro.Controllers
             var deptIdClaim = User.FindFirst("DepartmentId")?.Value;
 
             bool editarTodos = await _context.UserPermission
-                .AnyAsync(up => up.UserID == userId && up.Permission.Name == "Bienes.Editar");
+                .AnyAsync(up => up.UserID == userId && up.Permission.Name == "Bienes.VerTodos");
+
+            bool readOnly = false;
 
             if (!editarTodos)
             {
                 if (int.TryParse(deptIdClaim, out int deptId))
                 {
                     if (bien.DependenciaID != deptId)
-                        return Forbid();
+                    {
+                        var deptosVisibles = await ObtenerDepartamentosVisiblesAsync(deptIdClaim);
+                        if (!deptosVisibles.Contains(bien.DependenciaID))
+                            return Forbid(); 
+
+                        readOnly = true;
+                    }
                 }
                 else
                 {
@@ -344,6 +426,8 @@ namespace EtPro.Controllers
             }
 
             ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name", bien.DependenciaID);
+            ViewBag.ReadOnly = readOnly;
+
             return View(bien);
         }
 
@@ -361,7 +445,7 @@ namespace EtPro.Controllers
             var deptIdClaim = User.FindFirst("DepartmentId")?.Value;
 
             bool editarTodos = await _context.UserPermission
-                .AnyAsync(up => up.UserID == userId && up.Permission.Name == "Bienes.Editar");
+                .AnyAsync(up => up.UserID == userId && up.Permission.Name == "Bienes.VerTodos");
 
             if (!editarTodos)
             {
@@ -380,7 +464,6 @@ namespace EtPro.Controllers
             {
                 try
                 {
-                    await Task.Delay(1000);
 
                     bienEditado.Activo = bienOriginal.Activo;
                     bienEditado.Aprobado = bienOriginal.Aprobado;

@@ -80,32 +80,28 @@
     </div>
     <div class="info-content">
         <div class="inventory-stats-container green">
-            <div class="inventory-bubble">
-            </div>
+            <div class="inventory-bubble"></div>
             <div class="inventory-stat">
                 <h3>@Model.TotalBienes</h3>
                 <span id="totalBienes" data-id="@Model.TotalBienes">Total de bienes</span>
             </div>
         </div>
         <div class="inventory-stats-container white">
-            <div class="inventory-bubble">
-            </div>
+            <div class="inventory-bubble"></div>
             <div class="inventory-stat">
                 <h3>@Model.TotalActivos</h3>
                 <span>Bienes activos</span>
             </div>
         </div>
         <div class="inventory-stats-container red">
-            <div class="inventory-bubble">
-            </div>
+            <div class="inventory-bubble"></div>
             <div class="inventory-stat">
                 <h3>@Model.TotalMantenimiento</h3>
                 <span>En mantenimiento</span>
             </div>
         </div>
         <div class="inventory-stats-container white">
-            <div class="inventory-bubble">
-            </div>
+            <div class="inventory-bubble"></div>
             <div class="inventory-stat">
                 <h3>@Model.TotalDesincorporados</h3>
                 <span>Desincorporados</span>
@@ -113,58 +109,84 @@
         </div>
         <div class="item-container span4">
             <div class="item-header">
-                <span><b>Filtros de busqueda</b></span>
+                <span><b>Filtros de búsqueda</b></span>
             </div>
             <div class="search-container">
                 <div class="search-filter-container">
                     <div class="filter-container">
                         <span><b>Grupo</b></span>
                         <div class="input-container">
+                            <input type="text" id="filtroGrupo" placeholder="Grupo" />
                         </div>
                     </div>
                     <div class="filter-container">
                         <span><b>Subgrupo</b></span>
                         <div class="input-container">
+                            <input type="text" id="filtroSubgrupo" placeholder="Subgrupo" />
                         </div>
                     </div>
                     <div class="filter-container">
-                        <span><b>Seccion</b></span>
+                        <span><b>Sección</b></span>
                         <div class="input-container">
+                            <input type="text" id="filtroSeccion" placeholder="Sección" />
                         </div>
                     </div>
                     <div class="filter-container">
-                        <span><b>Nº de identificacion</b></span>
+                        <span><b>Nº de identificación</b></span>
                         <div class="input-container">
+                            <input type="text" id="filtroCodigo" placeholder="Buscar por código" />
                         </div>
                     </div>
                     <div class="filter-container">
-                        <span><b>Nombre / Descripcion</b></span>
+                        <span><b>Nombre / Descripción</b></span>
                         <div class="input-container input-group-text">
-                            <input placeholder="Buscar por nombre o descripcion" />
+                            <input type="text" id="filtroDescripcion" placeholder="Buscar por nombre o descripción" />
                         </div>
                     </div>
                     <div class="filter-container">
-                        <span><b>Unidad de trabajo o dependencia</b></span>
+                        <span><b>Departamento</b></span>
                         <div class="input-container">
+                            <select id="filtroDepartamento" class="form-select form-select-sm">
+                                <option value="">-- Todos --</option>
+                                @if (ViewBag.DepartmentsList != null)
+                                {
+                                    @foreach (var dept in ViewBag.DepartmentsList)
+                                    {
+                                        <option value="@dept.ID">@dept.Name</option>
+                                    }
+                                }
+                            </select>
                         </div>
                     </div>
                     <div class="filter-container">
                         <span><b>Responsable</b></span>
                         <div class="input-container">
+                            <select id="filtroResponsable" class="form-select form-select-sm">
+                                <option value="">-- Todos --</option>
+                                @if (ViewBag.ManagersList != null)
+                                {
+                                    @foreach (var manager in ViewBag.ManagersList)
+                                    {
+                                        <option value="@manager.ID">@manager.FullName</option>
+                                    }
+                                }
+                            </select>
                         </div>
                     </div>
                     <div class="filter-container">
                         <span><b>Fecha de registro</b></span>
-                        <div class="input-container">
+                        <div class="input-container" style="display: flex; gap: 5px;">
+                            <input type="date" id="filtroFechaDesde" class="form-control form-control-sm" />
+                            <input type="date" id="filtroFechaHasta" class="form-control form-control-sm" />
                         </div>
                     </div>
                     <div class="filter-container span4 search-form">
                         <span class="invisible">Padding</span>
                         <div class="filter-button-container">
-                            <a><b>Limpiar Filtros</b></a>
-                            <div class="search-button">
-                                <img src="~/imagenes/search-icon.png" alt="Busqueda" class="search-icon" />
-                                <button>Buscar</button>
+                            <a id="limpiarFiltros" style="cursor:pointer;"><b>Limpiar Filtros</b></a>
+                            <div class="search-button" id="btnBuscar">
+                                <img src="~/imagenes/search-icon.png" alt="Búsqueda" class="search-icon" />
+                                <button type="button">Buscar</button>
                             </div>
                         </div>
                     </div>
@@ -179,20 +201,20 @@
                 <thead>
                     <tr>
                         <th>Grupo</th>
-                        <th>Nº de identificacion</th>
+                        <th>Subgrupo</th>
+                        <th>Sección</th>
+                        <th>Nº de identificación</th>
                         <th>Marca</th>
                         <th>Nombre</th>
                         <th>Valor Total (Bs)</th>
                     </tr>
                 </thead>
-                <tbody id="inventoryTable">
-                </tbody>
+                <tbody id="inventoryTable"></tbody>
             </table>
             <div class="d-flex justify-content-between align-items-center mt-3 p-2 bg-white border-top">
                 <div class="text-secondary" id="infoPaginacion">
                     Mostrando <span id="rangoInicio">0</span> a <span id="rangoFin">0</span> de <span id="totalDisplay">0</span> registros
                 </div>
-
                 <div class="d-flex align-items-center gap-4">
                     <div class="d-flex align-items-center gap-2">
                         <span class="text-secondary small">Filas por página:</span>
@@ -202,16 +224,15 @@
                             <option value="50">50</option>
                         </select>
                     </div>
-                    <nav aria-label="Navegacion">
-                        <ul class="pagination pagination-sm mb-0" id="paginacionLista">
-                        </ul>
+                    <nav aria-label="Navegación">
+                        <ul class="pagination pagination-sm mb-0" id="paginacionLista"></ul>
                     </nav>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="~/js/bienes.js"></script>
+<script src="~/js/bienes.js?v=1.4"></script>
 @if (TempData["Success"] != null)
 {
     <script>

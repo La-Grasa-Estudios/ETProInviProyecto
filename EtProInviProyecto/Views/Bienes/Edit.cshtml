@@ -3,8 +3,9 @@
 @model BienMueble
 
 @{
-    ViewData["Title"] = "Modificar Registro de Bien";
+    ViewData["Title"] = (bool)(ViewBag.ReadOnly ?? false) ? "Ver Bien (Solo Lectura)" : "Modificar Registro de Bien";
     Layout = "_AdminLayout";
+    bool isReadOnly = (bool)(ViewBag.ReadOnly ?? false);
 }
 
 <div class="container mt-4">
@@ -19,6 +20,12 @@
                     <span class="badge bg-light text-secondary border px-3 py-2">ID INTERNO: @Model.ID</span>
                 </div>
             </div>
+            @if (isReadOnly)
+            {
+                <div class="alert alert-warning py-2 mb-0 mt-2 small">
+                    <i class="bi bi-lock-fill me-2"></i> Este bien pertenece a una unidad adscrita. No tiene permiso para editar sus datos.
+                </div>
+            }
             <hr class="mt-3 mb-0" style="opacity: 0.1;">
         </div>
 
@@ -33,87 +40,88 @@
                     <div class="col-md-4">
                         <label asp-for="NumeroIdentificacion" class="form-label fw-bold small text-uppercase text-muted">Nº de Identificación</label>
                         <input asp-for="NumeroIdentificacion" class="form-control form-control-sm bg-light fw-bold" readonly />
-                        <span asp-validation-for="NumeroIdentificacion" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-8">
                         <label asp-for="Nombre" class="form-label fw-bold small text-uppercase text-muted">Nombre del Elemento</label>
-                        <input asp-for="Nombre" class="form-control form-control-sm" placeholder="Ingrese nombre descriptivo" />
-                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                        <input asp-for="Nombre" class="form-control form-control-sm" placeholder="Ingrese nombre descriptivo" readonly="@isReadOnly" />
                     </div>
                     <div class="col-md-3">
                         <label asp-for="Marca" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Marca" class="form-control form-control-sm" />
+                        <input asp-for="Marca" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
-
                     <div class="col-md-3">
                         <label asp-for="Modelo" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Modelo" class="form-control form-control-sm" />
+                        <input asp-for="Modelo" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
-
                     <div class="col-md-3">
                         <label asp-for="Serial" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Serial" class="form-control form-control-sm" />
+                        <input asp-for="Serial" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
-
                     <div class="col-md-3">
                         <label asp-for="Color" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Color" class="form-control form-control-sm" />
+                        <input asp-for="Color" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
                     <div class="col-md-3">
                         <label asp-for="Material" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Material" class="form-control form-control-sm" />
+                        <input asp-for="Material" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
-
                     <div class="col-md-2">
                         <label asp-for="Grupo" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Grupo" class="form-control form-control-sm" />
+                        <input asp-for="Grupo" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
-
-                    <!-- Nuevos campos de clasificación -->
                     <div class="col-md-2">
                         <label asp-for="Subgrupo" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Subgrupo" class="form-control form-control-sm" />
+                        <input asp-for="Subgrupo" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
                     <div class="col-md-2">
                         <label asp-for="Seccion" class="form-label fw-bold small text-uppercase text-muted"></label>
-                        <input asp-for="Seccion" class="form-control form-control-sm" />
+                        <input asp-for="Seccion" class="form-control form-control-sm" readonly="@isReadOnly" />
                     </div>
-
                     <div class="col-md-4">
                         <label asp-for="DependenciaID" class="form-label fw-bold small text-uppercase text-muted">Departamento Asignado</label>
                         <select asp-for="DependenciaID" class="form-select form-select-sm"
-                                asp-items="@(ViewBag.Departments as SelectList)">
+                                asp-items="@(ViewBag.Departments as SelectList)" disabled="@isReadOnly">
                             <option value="">-- Seleccione Ubicación --</option>
                         </select>
-                        <span asp-validation-for="DependenciaID" class="text-danger small"></span>
                     </div>
-
                     <div class="col-md-3">
                         <label asp-for="ValorUnitario" class="form-label fw-bold small text-uppercase text-muted">Valor en Libros (Bs)</label>
                         <div class="input-group input-group-sm">
                             <span class="input-group-text bg-light border-end-0">Bs.</span>
-                            <input asp-for="ValorUnitario" class="form-control form-control-sm text-end fw-bold border-start-0" />
+                            <input asp-for="ValorUnitario" class="form-control form-control-sm text-end fw-bold border-start-0" readonly="@isReadOnly" />
                         </div>
                     </div>
                     <div class="col-12">
-                        <label asp-for="ObservacionesAdicionales" class="form-label fw-bold small text-uppercase text-muted">Notas y Observaciones de la Modificación</label>
-                        <textarea asp-for="ObservacionesAdicionales" class="form-control form-control-sm" rows="3" placeholder="Indique motivos del cambio o detalles relevantes..."></textarea>
+                        <label asp-for="ObservacionesAdicionales" class="form-label fw-bold small text-uppercase text-muted">Notas y Observaciones</label>
+                        <textarea asp-for="ObservacionesAdicionales" class="form-control form-control-sm" rows="3" placeholder="Indique motivos del cambio o detalles relevantes..." readonly="@isReadOnly"></textarea>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                    <div class="text-muted small">
-                        <i class="bi bi-info-circle me-1"></i> Verifique los datos antes de confirmar.
+
+                @if (!isReadOnly)
+                {
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <div class="text-muted small">
+                            <i class="bi bi-info-circle me-1"></i> Verifique los datos antes de confirmar.
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a asp-controller="Home" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm px-4">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-sm px-4 text-white shadow-sm" style="background-color: #004d26; border: none;">
+                                <i class="bi bi-cloud-upload me-1"></i> Guardar Cambios
+                            </button>
+                        </div>
                     </div>
-                    <div class="d-flex gap-2">
-                        <a asp-controller="Home" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm px-4">
-                            Cancelar
+                }
+                else
+                {
+                    <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                        <a asp-controller="Home" asp-action="Bienes" class="btn btn-outline-secondary btn-sm px-4">
+                            <i class="bi bi-arrow-left me-1"></i> Volver al listado
                         </a>
-                        <button type="submit" class="btn btn-sm px-4 text-white shadow-sm" style="background-color: #004d26; border: none;">
-                            <i class="bi bi-cloud-upload me-1"></i> Guardar Cambios
-                        </button>
                     </div>
-                </div>
+                }
             </form>
         </div>
     </div>
@@ -122,38 +130,39 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('editForm');
-
-        form.addEventListener('submit', function (e) {
-        e.preventDefault(); // Detener envío para mostrar alerta
-
-        Swal.fire({
-        title: '¿Desea aplicar los cambios?',
-        text: "La información del bien @Model.NumeroIdentificacion será actualizada permanentemente.",
-        icon: 'warning',
-        theme: 'auto',
-        showCancelButton: true,
-        confirmButtonColor: '#004d26',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, confirmar',
-        cancelButtonText: 'Cancelar',
-        reverseButtons: true
-        }).then((result) => {
-        if (result.isConfirmed) {
-        Swal.fire({
-        title: 'Procesando...',
-        theme: 'auto',
-        didOpen: () => { Swal.showLoading() },
-        allowOutsideClick: false
-        });
-        form.submit();
-        }
-        });
-        });
-        });
-    </script>
+    @if (!isReadOnly)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('editForm');
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: '¿Desea aplicar los cambios?',
+                        text: "La información del bien @Model.NumeroIdentificacion será actualizada permanentemente.",
+                        icon: 'warning',
+                        theme: 'auto',
+                        showCancelButton: true,
+                        confirmButtonColor: '#004d26',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, confirmar',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Procesando...',
+                                theme: 'auto',
+                                didOpen: () => { Swal.showLoading() },
+                                allowOutsideClick: false
+                            });
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        </script>
+    }
 }
 
 <style>
@@ -180,8 +189,7 @@
         color: #6c757d;
     }
 
-    /* Estilo para inputs de solo lectura */
-    input[readonly] {
+    input[readonly], textarea[readonly], select[disabled] {
         background-color: #fdfdfd !important;
         border-style: dashed;
         color: #495057;

@@ -120,25 +120,93 @@ namespace EtPro.Controllers
         [PermissionAuthorize("Bienes.VerPropios")]
         public async Task<IActionResult> Bienes()
         {
-
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var deptClaim = User.FindFirst("DepartmentId")?.Value;
 
             IQueryable<BienMueble> query = _context.Bienes.Where(b => b.Activo && b.Aprobado);
 
-            if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
+            bool verTodos = User.HasClaim("Permiso", "Bienes.VerTodos");
+
+            if (!verTodos)
             {
                 if (int.TryParse(deptClaim, out int deptId))
-                    query = query.Where(b => b.DependenciaID == deptId);
+                {
+                    var deptosVisibles = await _context.Departments
+                        .Where(d => d.ID == deptId || d.ParentDepartmentID == deptId)
+                        .Select(d => d.ID)
+                        .ToListAsync();
+
+                    query = query.Where(b => deptosVisibles.Contains(b.DependenciaID));
+                }
                 else
+                {
                     query = query.Where(b => false);
+                }
             }
+
+            int totalBienes = await query.CountAsync();
+            int totalActivos = await query.CountAsync(b => b.Activo);
+            int totalDesincorporados = 0;
+            if (verTodos)
+            {
+                totalDesincorporados = await _context.Bienes.CountAsync(b => !b.Activo);
+            }
+            else if (int.TryParse(deptClaim, out int dId))
+            {
+                var deptosVisibles = await _context.Departments
+                    .Where(d => d.ID == dId || d.ParentDepartmentID == dId)
+                    .Select(d => d.ID)
+                    .ToListAsync();
+                totalDesincorporados = await _context.Bienes.CountAsync(b => !b.Activo && deptosVisibles.Contains(b.DependenciaID));
+            }
+
+            var idsVisibles = await query.Select(b => b.ID).ToListAsync();
+            int totalMantenimiento = await _context.Movements
+                .CountAsync(m => m.Type == MovementType.Traspaso && idsVisibles.Contains(m.BienId));
 
             var model = new BienesRegistradosViewModel
             {
-                TotalBienes = await query.CountAsync(),
-                TotalActivos = await query.CountAsync(b => b.Activo)
+                TotalBienes = totalBienes,
+                TotalActivos = totalActivos,
+                TotalMantenimiento = totalMantenimiento,
+                TotalDesincorporados = totalDesincorporados
             };
+
+            if (verTodos)
+            {
+                ViewBag.DepartmentsList = await _context.Departments.ToListAsync();
+                ViewBag.ManagersList = await _context.Departments
+                    .Where(d => d.ManagerID != null)
+                    .Select(d => d.Manager)
+                    .Distinct()
+                    .ToListAsync();
+            }
+            else
+            {
+                if (int.TryParse(deptClaim, out int deptId))
+                {
+                    var deptosVisiblesIds = await _context.Departments
+                        .Where(d => d.ID == deptId || d.ParentDepartmentID == deptId)
+                        .Select(d => d.ID)
+                        .ToListAsync();
+
+                    ViewBag.DepartmentsList = await _context.Departments
+                        .Where(d => deptosVisiblesIds.Contains(d.ID))
+                        .ToListAsync();
+
+                    ViewBag.ManagersList = await _context.Departments
+                        .Where(d => deptosVisiblesIds.Contains(d.ID) && d.ManagerID != null)
+                        .Select(d => d.Manager)
+                        .Distinct()
+                        .ToListAsync();
+                }
+                else
+                {
+                    ViewBag.DepartmentsList = new List<Department>();
+                    ViewBag.ManagersList = new List<User>();
+                }
+            }
+
             return View(model);
         }
     }
