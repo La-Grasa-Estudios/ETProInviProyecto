@@ -133,7 +133,7 @@ namespace EtPro.Controllers
             return View(movimientos);
         }
 
-        public async Task<IActionResult> SolicitarTraspaso()
+        public async Task<IActionResult> SolicitarTraspaso(int? bienId = null)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var deptIdClaim = User.FindFirst("DepartmentId")?.Value;
@@ -147,11 +147,10 @@ namespace EtPro.Controllers
                 if (int.TryParse(deptIdClaim, out int deptId))
                     query = query.Where(b => b.DependenciaID == deptId);
                 else
-                    return Forbid();  
+                    return Forbid();
             }
 
             var bienes = await query.ToListAsync();
-
 
             int? currentDept = null;
             if (int.TryParse(deptIdClaim, out int dId))
@@ -163,7 +162,13 @@ namespace EtPro.Controllers
 
             ViewBag.Bienes = new SelectList(bienes, "ID", "NumeroIdentificacion");
             ViewBag.Departments = new SelectList(departamentosDestino, "ID", "Name");
-            return View(new SolicitarTraspasoViewModel());
+
+            var model = new SolicitarTraspasoViewModel
+            {
+                BienId = bienId ?? 0  
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -237,6 +242,7 @@ namespace EtPro.Controllers
                 Subgrupo = model.Subgrupo,
                 Seccion = model.Seccion,
                 FechaRegistro = DateTime.UtcNow,
+                Origen = model.Origen,
                 Aprobado = registroDirecto  
             };
 
@@ -268,10 +274,13 @@ namespace EtPro.Controllers
 
         [HttpGet]
         [PermissionAuthorize("Bienes.Desincorporar")]
-        public async Task<IActionResult> SolicitarDesincorporacion()
+        public async Task<IActionResult> SolicitarDesincorporacion(int? bienId = null)
         {
-            await CargarDropdownsDesincorporacion();
-            return View(new SolicitarDesincorporacionViewModel());
+            await CargarDropdownsDesincorporacion(bienId);
+            return View(new SolicitarDesincorporacionViewModel
+            {
+                BienId = bienId ?? 0
+            });
         }
 
         [HttpGet]

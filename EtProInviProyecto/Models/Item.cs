@@ -49,6 +49,10 @@ public class BienMueble
     public bool Aprobado { get; set; } = false;
     public DateTime? FechaRegistro { get; set; }
 
+    [Required(ErrorMessage = "El origen del bien es obligatorio")]
+    [MaxLength(50)]
+    public string Origen { get; set; }
+
     [NotMapped]
     public string DescripcionBM1
     {

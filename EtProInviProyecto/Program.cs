@@ -27,6 +27,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<PdfService>();
+builder.Services.AddScoped<QrService>();
 
 // ─── Autorización personalizada ───
 builder.Services.AddHttpContextAccessor();

@@ -365,6 +365,9 @@ namespace EtPro.Controllers
                     return Forbid();
             }
 
+            var departamento = await _context.Departments.FindAsync(bien.DependenciaID);
+            ViewBag.DepartamentoNombre = departamento?.Name ?? "Sin asignar";
+
             return View(bien);
         }
 

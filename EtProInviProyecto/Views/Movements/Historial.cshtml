@@ -1,231 +1,88 @@
-﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-
-@model EtProInviProyecto.Models.BienesRegistradosViewModel;
+﻿@using EtPro.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Movement>
 @{
-    Layout = "_AdminLayout";
-    ViewData["PageName"] = "Bienes Registrados";
-    ViewData["PageDescription"] = "Control y consulta de los bienes institucionales registrados en el sistema";
+    ViewData["Title"] = "Historial de Movimientos";
+    Layout = null;
 }
 
-<link rel="stylesheet" href="~/css/bienes.css" asp-append-version="true" />
-
-<div class="main-container">
-    <div class="actions-container">
-        @if (User.HasClaim("Permiso", "Bienes.Crear"))
-        {
-            <div class="stylized-button">
-                <button onclick="window.location.href='/Movements/SolicitarIncorporacion'">Incorporar bien</button>
-            </div>
-        }
-        @if (User.HasClaim("Permiso", "Bienes.Desincorporar"))
-        {
-            <div class="stylized-button-red btn-spaced">
-                <button onclick="window.location.href='/Movements/SolicitarDesincorporacion'">
-                    Solicitar Desincorporación
-                </button>
-            </div>
-        }
-        @if (User.HasClaim("Permiso", "Movimientos.SolicitarTraspaso"))
-        {
-            <div class="stylized-button btn-spaced">
-                <button onclick="window.location.href='/Movements/SolicitarTraspaso'">
-                    Solicitar Traspaso
-                </button>
-            </div>
-        }
-        @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
-        {
-            <div class="stylized-button btn-spaced">
-                <button onclick="window.location.href='/Movements/HistorialTraspasos'">
-                    Historial de Traspasos
-                </button>
-            </div>
-        }
-        @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso") || User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion") || User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
-        {
-            <div class="dropdown btn-spaced">
-                <button class="btn-approve-dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Aprobar
-                </button>
-                <ul class="dropdown-menu">
-                    @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso"))
-                    {
-                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesTraspaso">Traspasos pendientes</a></li>
-                    }
-                    @if (User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion"))
-                    {
-                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesDesincorporacion">Desincorporaciones pendientes</a></li>
-                    }
-                    @if (User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
-                    {
-                        <li><a class="dropdown-item" asp-controller="Movements" asp-action="PendientesIncorporacion">Incorporaciones pendientes</a></li>
-                    }
-                </ul>
-            </div>
-        }
-        @if (User.HasClaim("Permiso", "Reportes.VerPropios") || User.HasClaim("Permiso", "Reportes.VerTodos"))
-        {
-            <div class="dropdown btn-spaced">
-                <button class="btn-approve-dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Reportes
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="InventarioPorDepartamento">Inventario por Departamento</a></li>
-                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="Movimientos">Movimientos</a></li>
-                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="BienesDesincorporados">Bienes Desincorporados</a></li>
-                    <li><a class="dropdown-item" asp-controller="Reportes" asp-action="EstadoInventario">Estado del Inventario</a></li>
-                </ul>
-            </div>
-        }
-    </div>
-    <div class="info-content">
-        <div class="inventory-stats-container green">
-            <div class="inventory-bubble">
-            </div>
-            <div class="inventory-stat">
-                <h3>@Model.TotalBienes</h3>
-                <span id="totalBienes" data-id="@Model.TotalBienes">Total de bienes</span>
-            </div>
-        </div>
-        <div class="inventory-stats-container white">
-            <div class="inventory-bubble">
-            </div>
-            <div class="inventory-stat">
-                <h3>@Model.TotalActivos</h3>
-                <span>Bienes activos</span>
-            </div>
-        </div>
-        <div class="inventory-stats-container red">
-            <div class="inventory-bubble">
-            </div>
-            <div class="inventory-stat">
-                <h3>@Model.TotalMantenimiento</h3>
-                <span>En mantenimiento</span>
-            </div>
-        </div>
-        <div class="inventory-stats-container white">
-            <div class="inventory-bubble">
-            </div>
-            <div class="inventory-stat">
-                <h3>@Model.TotalDesincorporados</h3>
-                <span>Desincorporados</span>
-            </div>
-        </div>
-        <div class="item-container span4">
-            <div class="item-header">
-                <span><b>Filtros de busqueda</b></span>
-            </div>
-            <div class="search-container">
-                <div class="search-filter-container">
-                    <div class="filter-container">
-                        <span><b>Grupo</b></span>
-                        <div class="input-container">
-                        </div>
-                    </div>
-                    <div class="filter-container">
-                        <span><b>Subgrupo</b></span>
-                        <div class="input-container">
-                        </div>
-                    </div>
-                    <div class="filter-container">
-                        <span><b>Seccion</b></span>
-                        <div class="input-container">
-                        </div>
-                    </div>
-                    <div class="filter-container">
-                        <span><b>Nº de identificacion</b></span>
-                        <div class="input-container">
-                        </div>
-                    </div>
-                    <div class="filter-container">
-                        <span><b>Nombre / Descripcion</b></span>
-                        <div class="input-container input-group-text">
-                            <input placeholder="Buscar por nombre o descripcion" />
-                        </div>
-                    </div>
-                    <div class="filter-container">
-                        <span><b>Unidad de trabajo o dependencia</b></span>
-                        <div class="input-container">
-                        </div>
-                    </div>
-                    <div class="filter-container">
-                        <span><b>Responsable</b></span>
-                        <div class="input-container">
-                        </div>
-                    </div>
-                    <div class="filter-container">
-                        <span><b>Fecha de registro</b></span>
-                        <div class="input-container">
-                        </div>
-                    </div>
-                    <div class="filter-container span4 search-form">
-                        <span class="invisible">Padding</span>
-                        <div class="filter-button-container">
-                            <a><b>Limpiar Filtros</b></a>
-                            <div class="search-button">
-                                <img src="~/imagenes/search-icon.png" alt="Busqueda" class="search-icon" />
-                                <button>Buscar</button>
-                            </div>
-                        </div>
-                    </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gestión de Bienes</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bienes.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-3">
+                <div class="d-flex align-items-center">
+                    <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
+                    <h4 class="mb-0 text-dark fw-bold">@ViewData["Title"]</h4>
                 </div>
+                <hr class="mt-3 mb-0" style="opacity: 0.1;">
             </div>
-        </div>
-        <div class="item-container span4 table-container">
-            <div class="item-header">
-                <span><b>Listado de bienes</b></span>
-            </div>
-            <table class="custom-inventory-table">
-                <thead>
-                    <tr>
-                        <th>Grupo</th>
-                        <th>Subgrupo</th>
-                        <th>Sección</th>
-                        <th>Nº de identificacion</th>
-                        <th>Marca</th>
-                        <th>Nombre</th>
-                        <th>Valor Total (Bs)</th>
-                    </tr>
-                </thead>
-                <tbody id="inventoryTable">
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-items-center mt-3 p-2 bg-white border-top">
-                <div class="text-secondary" id="infoPaginacion">
-                    Mostrando <span id="rangoInicio">0</span> a <span id="rangoFin">0</span> de <span id="totalDisplay">0</span> registros
-                </div>
 
-                <div class="d-flex align-items-center gap-4">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="text-secondary small">Filas por página:</span>
-                        <select id="selectResultados" class="form-select form-select-sm" style="width: 70px;" onchange="cambiarCantidad()">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
+            <div class="card-body p-4">
+                @if (!Model.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        <p>No hay movimientos registrados para este bien.</p>
                     </div>
-                    <nav aria-label="Navegacion">
-                        <ul class="pagination pagination-sm mb-0" id="paginacionLista">
-                        </ul>
-                    </nav>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-uppercase small text-secondary">Fecha</th>
+                                    <th class="text-uppercase small text-secondary">Tipo</th>
+                                    <th class="text-uppercase small text-secondary">Origen</th>
+                                    <th class="text-uppercase small text-secondary">Destino</th>
+                                    <th class="text-uppercase small text-secondary">Solicitante</th>
+                                    <th class="text-uppercase small text-secondary">Aprobador</th>
+                                    <th class="text-uppercase small text-secondary">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="text-nowrap">@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@item.Type</td>
+                                        <td>@item.OriginDepartment?.Name</td>
+                                        <td>@item.DestinationDepartment?.Name</td>
+                                        <td>@item.UsuarioSolicitante?.UserName</td>
+                                        <td>@item.UsuarioAprobador?.UserName</td>
+                                        <td>
+                                            <span class="badge @(item.Estado == "Aprobado" ? "bg-success" : item.Estado == "Rechazado" ? "bg-danger" : "bg-warning text-dark")">
+                                                @item.Estado
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a href="javascript:history.back()" class="btn btn-light btn-sm px-4 border text-secondary">Volver</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script src="~/js/bienes.js"></script>
-@if (TempData["Success"] != null)
-{
-    <script>
-        document.addEventListener('DOMContentLoaded', () =>
-        {
-            Swal.fire({
-                title: 'Correcto',
-                text: 'Bien actualizado correctamente!',
-                icon: 'success',
-                confirmButtonText: 'Continuar',
-                theme: 'auto'
-            })
-        });
-    </script>
-}
+
+    <style>
+        .form-control:focus, .form-select:focus {
+            border-color: #004d26;
+            box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.1);
+        }
+    </style>
+</body>
+</html>

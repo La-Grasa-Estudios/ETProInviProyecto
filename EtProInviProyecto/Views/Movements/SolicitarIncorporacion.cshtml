@@ -83,6 +83,12 @@
                             <input asp-for="Material" class="form-control form-control-sm" />
                         </div>
 
+                        <div class="col-md-3">
+                            <label asp-for="Origen" class="form-label fw-semibold small text-uppercase text-secondary">Origen</label>
+                            <input asp-for="Origen" class="form-control form-control-sm" placeholder="Proimca / Fudet" />
+                            <span asp-validation-for="Origen" class="text-danger small"></span>
+                        </div>
+
                         <div class="col-md-2">
                             <label asp-for="Grupo" class="form-label fw-semibold small text-uppercase text-secondary"></label>
                             <input asp-for="Grupo" class="form-control form-control-sm" />

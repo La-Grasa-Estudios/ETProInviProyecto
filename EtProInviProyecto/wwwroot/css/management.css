@@ -6,14 +6,29 @@
     height: 100dvh;
 }
 
-.sidebar {
+.management-header {
     position: fixed;
     top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    background-color: rgba(240, 240, 240, 255);
+    height: 100px;
+    align-items: center;
+    padding: 0px;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    background-color: white;
+}
+
+.sidebar {
+    position: fixed;
+    top: 100px; 
     left: 0;
     width: 250px;
     background-color: rgba(0, 64, 0, 255);
     color: white;
-    height: 100vh;
+    height: calc(100vh - 100px);
     padding: 0px;
     box-sizing: border-box;
     display: flex;
@@ -22,14 +37,13 @@
     overflow-y: visible;
     scrollbar-width: none;
     box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.5);
-    z-index: 10;
+    z-index: 5;
     transition: transform 0.3s ease;
-    margin-bottom: auto;
 }
 
-.sidebar.hidden {
-    transform: translateX(-100%); /* La mueve a la izquierda fuera de la vista */
-}
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+    }
 
 .sidebar-toggle-button {
     position: absolute;
@@ -52,29 +66,20 @@
     background-repeat: no-repeat;
 }
 
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    background: white;
-    height: 100px;
+
+.main-content {
+    margin-left: 250px; 
+    padding-top: 100px; 
+    width: 100%;
+    height: 100%;
+    transition: margin-left 0.3s ease;
+    box-sizing: border-box;
 }
 
-.sidebar-header span {
-    color: black;
-}
+    .main-content.expanded {
+        margin-left: 0;
+    }
 
-.management-header {
-    position: sticky;
-    top: 0;
-    display: flex;
-    background-color: rgba(240, 240, 240, 255);
-    height: 100px;
-    align-items: center;
-    padding: 0px;
-    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.5);
-}
 
 .header-logo {
     margin-right: auto;
@@ -92,8 +97,7 @@
     margin-left: auto;
 }
 
-.page-name
-{
+.page-name {
     margin-left: 50px;
 }
 
@@ -140,16 +144,16 @@
     height: 50px;
 }
 
-.input-group-text input {
-    width: 100%;
-    height: 100%;
-    background-color: inherit;
-    border: none;
-}
+    .input-group-text input {
+        width: 100%;
+        height: 100%;
+        background-color: inherit;
+        border: none;
+    }
 
-.input-group-text input:focus {
-    outline: none;
-}
+        .input-group-text input:focus {
+            outline: none;
+        }
 
 .search-icon-container {
     display: flex;
@@ -166,6 +170,31 @@
     height: 20px;
 }
 
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 0;
+        transition: background 0.3s;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+        .nav-links a:hover {
+            background-color: green;
+            padding: 8px 8px;
+        }
+
+        .nav-links a.active {
+            background-color: #16a085;
+            padding: 10px 16px;
+        }
+
 .logout-container {
     margin-top: auto;
     display: flex;
@@ -175,20 +204,19 @@
     padding: 40px;
 }
 
-.logout-container button:hover {
-    background-color: green;
-}
+    .logout-container button {
+        width: 150px;
+        height: 50px;
+        border-radius: 10px;
+        background-color: transparent;
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
 
-.logout-container button {
-    width: 150px;
-    height: 50px;
-    border-radius: 10px;
-    background-color: transparent;
-    border: none;
-    margin-left: 0px;
-    color: white;
-    transition: all 0.3s ease;
-}
+        .logout-container button:hover {
+            background-color: green;
+        }
 
 .logout-form {
     width: 200px;
@@ -197,15 +225,6 @@
     padding: 20px;
 }
 
-.github-logo {
-    width: 48px;
-    height: 48px;
-    transition: transform 0.2s ease;
-}
-
-.github-logo:hover {
-    transform: scale(1.1);
-}
 
 .logo {
     width: 100%;
@@ -214,145 +233,31 @@
     margin-right: 10px;
 }
 
-.org-name {
-    font-size: 18px;
-    font-weight: bold;
-    line-height: 1;
-}
-
-hr {
-    border: 0;
-    height: 1px;
-    background-color: #7f8c8d;
-    margin: 10px 0;
-}
-
-.modal-background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2;
-    background-color: rgba(0.75, 0.75, 0.75, 0.5);
-    transition: opacity 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.modal-background.open {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.modal-container {
-    position: relative;
-    width: 500px;
-    height: 250px;
-    border-radius: 15px;
-    background-color: white;
-    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2);
-    padding: 5px;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-
-.modal-text {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 10px;
-}
-
-.modal-text p {
-    margin: 0;
-    margin-top: 10px;
-}
-
-.modal-buttons {
-    display: flex;
-    flex-direction: row;
-    padding: 5px;
-    gap: 10px;
-}
-
-.modal-close-icon {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    top: 0;
-    right: 0;
-    margin-top: 10px;
-    margin-right: 10px;
-    cursor: pointer;
-}
-
-.modal-buttons button {
-}
-
-.nav-links {
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-}
-
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    padding: 8px 0;
-    transition: background 0.3s;
-    border-radius: 8px;
-    transition: padding 0.3s ease;
-    margin-bottom: 8px;
-}
-
-.nav-links a:hover {
-    background-color: green;
-    padding: 8px 8px;
-    display: block;
-    transition: all 0.3s ease;
-}
-
-.nav-links a.active {
-    background-color: #16a085;
-    padding: 10px 16px;
-    display: block;
-    transition: all 0.3s ease;
-}
-
-.main-content
-{
-    width: 100%;
-    height: 100%;
-}
-
 .stylized-button {
     border-radius: 5px;
     background-color: forestgreen;
     padding: 10px;
 }
 
-.stylized-button button {
-    background-color: transparent;
-    border: none;
-    color: white;
-    font-weight: bold;
-}
+    .stylized-button button {
+        background-color: transparent;
+        border: none;
+        color: white;
+        font-weight: bold;
+    }
 
-.management-header {
-    position: sticky;
-    top: 0;
-    z-index: 100; 
-    background-color: white; 
-}
 
-.actions-container {
-    position: relative;
-    z-index: 1;
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 250px;
+    }
+
+        .sidebar:not(.collapsed) {
+            transform: translateX(0);
+        }
+
+    .main-content {
+        margin-left: 0;
+    }
 }

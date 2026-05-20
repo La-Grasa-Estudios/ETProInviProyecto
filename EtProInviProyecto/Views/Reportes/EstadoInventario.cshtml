@@ -28,23 +28,6 @@
             </div>
 
             <div class="card-body p-4">
-                <form method="post">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold small text-uppercase text-secondary">Modo</label>
-                            <select name="modo" class="form-select form-select-sm">
-                                <option value="vista">Ver en pantalla</option>
-                                <option value="pdf">Descargar PDF</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-dark btn-sm px-4" style="background-color: #004d26; border: none;">
-                                <i class="bi bi-funnel"></i> Generar
-                            </button>
-                        </div>
-                    </div>
-                </form>
-
                 <div class="table-responsive mt-4">
                     <table class="table table-hover align-middle mb-0" style="max-width: 500px; font-size: 0.85rem;">
                         <thead class="table-light">
@@ -73,6 +56,14 @@
                         </tbody>
                     </table>
                 </div>
+
+                <form method="post" class="mt-4 text-end">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="modo" value="pdf" />
+                    <button type="submit" class="btn btn-dark btn-sm px-4" style="background-color: #004d26; border: none;">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Descargar PDF
+                    </button>
+                </form>
             </div>
         </div>
     </div>

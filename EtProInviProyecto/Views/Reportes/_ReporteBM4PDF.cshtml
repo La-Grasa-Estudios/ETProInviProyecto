@@ -1,0 +1,89 @@
+﻿@model EtPro.Models.ReporteBM4ViewModel
+@{
+    var logoPath = ViewBag.LogoPath as string;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>BM‑4</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 0.85rem;
+            color: #000;
+            margin: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+            .header img {
+                width: 80px;
+            }
+
+        h1 {
+            font-size: 1.2rem;
+            margin: 5px 0;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: 0.9rem;
+            margin: 2px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e6e6e6;
+        }
+
+        .firma {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .firma div {
+                width: 45%;
+                text-align: center;
+                border-top: 1px solid #000;
+                padding-top: 5px;
+            }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="@logoPath" alt="Logo" />
+        <h1>Formato BM‑4</h1>
+        <h2>Resumen de Montos Totales</h2>
+        <p>Mes: @Model.Mes</p>
+    </div>
+
+    <table>
+        <tr><th>Saldo Anterior</th><td>@Model.SaldoAnterior</td></tr>
+        <tr><th>Incorporaciones</th><td>@Model.TotalIncorporaciones</td></tr>
+        <tr><th>Desincorporaciones</th><td>@Model.TotalDesincorporaciones</td></tr>
+        <tr><th>Saldo Actual</th><td>@Model.SaldoActual</td></tr>
+        <tr><th>Valor Total (Bs)</th><td>@Model.ValorTotal.ToString("N2")</td></tr>
+    </table>
+
+    <div class="firma">
+        <div>Firma del Gerente de Área</div>
+        <div>Firma de Administración</div>
+    </div>
+</body>
+</html>

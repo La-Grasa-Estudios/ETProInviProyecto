@@ -153,7 +153,8 @@ namespace EtPro.Data
                     ObservacionesAdicionales = "Asignada al superadmin",
                     Aprobado = true,
                     Activo = true,
-                    FechaRegistro = DateTime.Now
+                    FechaRegistro = DateTime.Now,
+                    Origen = "mipene"
                 });
                 context.SaveChanges();
             }

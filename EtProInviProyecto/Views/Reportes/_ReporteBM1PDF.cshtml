@@ -1,0 +1,248 @@
+﻿@using EtPro.Models;
+@model IEnumerable<BienMueble>
+@{
+    var deptNames = ViewBag.Departments as Dictionary<int, string>;
+    var logoPath = ViewBag.LogoPath as string;
+    var logoTrujilloPath = ViewBag.LogoTrujilloPath as string;
+
+    var fecha = DateTime.Now.ToString("dd/MM/yyyy");
+
+    decimal totalGeneral = Model != null ? Model.Sum(m => m.ValorUnitario) : 0;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>BM-1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            color: #000;
+            margin: 15px;
+            text-transform: uppercase;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .bg-blue {
+            background-color: #9cc2e5;
+        }
+
+        .bg-pink {
+            background-color: #f4cccc;
+        }
+
+        .text-green {
+            color: #00b050;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        .table-main, .table-main th, .table-main td {
+            border: 1px solid #000;
+        }
+
+        .table-main {
+            border: 2px solid #000;
+            margin-bottom: 5px;
+        }
+
+            .table-main th, .table-main td {
+                padding: 4px;
+                vertical-align: middle;
+                height: 18px;
+            }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+            margin: auto;
+        }
+
+        .info-box {
+            border: 2px solid #000;
+            background-color: #9cc2e5;
+            margin-bottom: 10px;
+        }
+
+            .info-box td {
+                padding: 6px;
+                vertical-align: top;
+                font-size: 10px;
+                font-weight: bold;
+                border: none;
+            }
+
+        .header-table td {
+            border: none;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <table class="header-table" style="margin-bottom: 10px;">
+        <tr>
+            <td style="width: 25%; text-align: left;">
+                <img src="@logoPath" alt="ETPROINVI" style="height: 60px;" />
+            </td>
+            <td style="width: 50%; text-align: center; font-size: 11px; font-weight: bold; line-height: 1.2;">
+                REPÚBLICA BOLIVARIANA DE VENEZUELA<br />
+                EMPRESA TRUJILLANA DE PROYECTOS INFRESTRUCTURA Y VIVIENDA, S.A.<br />
+                ETPROINVI, S.A<br />
+                RIF. J-50070336-8
+            </td>
+            <td style="width: 25%; text-align: right;">
+                <img src="@logoTrujilloPath" alt="Gobierno de Trujillo" style="height: 60px;" />
+            </td>
+        </tr>
+    </table>
+
+    <table style="margin-bottom: 5px; border: 2px solid #000;">
+        <tr>
+            <td class="bg-blue text-center bold" style="font-size: 12px; padding: 4px; border-right: 2px solid #000;">
+                INVENTARIO DE BIENES MUEBLES
+            </td>
+            <td style="background-color: #fff; width: 180px; text-align: center; font-weight: bold; font-size: 11px; padding: 4px;">
+                FORMULARIO BM-1
+            </td>
+        </tr>
+    </table>
+
+    <table class="info-box">
+        <tr>
+            <td style="width: 50%;">
+                1. ENTIDAD PROPIETARIA: ESTADO TRUJILLO<br /><br />
+                3. UNIDAD DE TRABAJO O DEPENDENCIA: ANDINEX<br /><br />
+                5. MUNICIPIO: VALERA<br /><br />
+                7. FECHA: @fecha
+            </td>
+            <td style="width: 50%;">
+                2. UNIDAD DE SERVICIO: ANDINEX<br /><br />
+                4. ESTADO: TRUJILLO<br /><br />
+                6. DIRECCIÓN: AV. BOLIVAR ENTRE CALLES 25 Y 26, SECTOR LAS ACACIAS.<br />
+                FRENTE A LA U.E "IGNACIO MARTIN BURK"<br /><br />
+                8. ELABORADO POR:<br />
+                FIRMA: _______________________ C.I: V ________________
+            </td>
+        </tr>
+    </table>
+
+    <table class="table-main">
+        <thead>
+            <tr>
+                <th colspan="3" class="bg-blue text-center bold">CLASIFICACIÓN-<br />CÓDIGO</th>
+                <th rowspan="2" class="bg-blue bold" style="width: 30px;">
+                    <div class="vertical-text">CANT.</div>
+                </th>
+                <th rowspan="2" class="bg-blue bold" style="width: 70px;">
+                    <div class="vertical-text" style="height: 100px;">N° DE<br />IDENTIFICACIÓN</div>
+                </th>
+                <th rowspan="2" class="bg-blue text-center bold">NOMBRE Y DESCRIPCIÓN DE LOS ELEMENTOS</th>
+                <th rowspan="2" class="bg-blue text-center bold" style="width: 80px;">VALOR TOTAL<br /><br />(BS)</th>
+            </tr>
+            <tr>
+                <th class="bg-blue bold" style="width: 25px; height: 70px;"><div class="vertical-text">GRUPO</div></th>
+                <th class="bg-blue bold" style="width: 25px;"><div class="vertical-text">SUB-<br />GRUPO</div></th>
+                <th class="bg-blue bold" style="width: 25px;"><div class="vertical-text">SECCIÓN</div></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowCount = 0;
+                int maxRows = 12;
+
+                if (Model != null)
+                {
+                    foreach (var b in Model)
+                    {
+                        rowCount++;
+                        <tr>
+                            <td class="text-center bold">@b.Grupo</td>
+                            <td class="text-center bold">@(string.IsNullOrEmpty(b.Subgrupo) ? "00" : b.Subgrupo)</td>
+                            <td class="text-center bold">@(string.IsNullOrEmpty(b.Seccion) ? "00" : b.Seccion)</td>
+
+                            <td class="text-center bold">1</td>
+                            <td class="text-center bold bg-pink">@b.NumeroIdentificacion</td>
+
+                            <td class="bold">
+                                @b.Nombre
+                                @if (!string.IsNullOrEmpty(b.Marca))
+                                {
+                                    <span> MARCA @b.Marca,</span>
+                                }
+                                @if (!string.IsNullOrEmpty(b.Modelo))
+                                {
+                                    <span> MODELO @b.Modelo,</span>
+                                }
+                                @if (!string.IsNullOrEmpty(b.Serial))
+                                {
+                                    <span> S/N: @b.Serial </span>
+                                }
+
+                                <span class="text-green"> @b.Origen</span>
+                            </td>
+
+                            <td class="text-right bold">@b.ValorUnitario.ToString("N2")</td>
+                        </tr>
+                    }
+                }
+
+                for (int i = rowCount; i < maxRows; i++)
+                {
+                    <tr>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold bg-pink">&nbsp;</td>
+                        <td class="bold">&nbsp;</td>
+                        <td class="text-right bold">0.00</td>
+                    </tr>
+                }
+            }
+
+            <tr>
+                <td colspan="6" class="text-right bold">TOTAL.......................................................................................</td>
+                <td class="text-right bold">@totalGeneral.ToString("N2")</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table style="width: 100%; border: none; font-size: 10px; font-weight: bold; margin-top: 30px;">
+        <tr>
+            <td style="width: 40%; text-align: left; border: none;">
+                NOMBRE Y APELLIDO DEL JEFE DE LA UNIDAD: LICDA. RIVAS EMILY<br />
+                C.I: 29.803.103
+            </td>
+            <td style="width: 20%; text-align: center; border: none; vertical-align: bottom;">
+                PAGINA 1
+            </td>
+            <td style="width: 40%; text-align: right; border: none; vertical-align: bottom;">
+                FIRMA Y SELLO: __________________________
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

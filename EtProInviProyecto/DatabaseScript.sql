@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS BienesMuebles (
     Grupo INT NOT NULL DEFAULT 2,
     Subgrupo VARCHAR(10) NULL,
     Seccion VARCHAR(10) NULL,
+    Origen VARCHAR(50) NOT NULL,
     DependenciaID INT NOT NULL,
     ValorUnitario DECIMAL(18,2) NOT NULL,
     Activo TINYINT(1) NOT NULL DEFAULT 1,

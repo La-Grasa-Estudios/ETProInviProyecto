@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Reporte de Inventario";
     Layout = null;
+    bool filtroAplicado = (bool)(ViewBag.FiltroAplicado ?? false);
 }
 
 <!DOCTYPE html>
@@ -28,35 +29,25 @@
             </div>
 
             <div class="card-body p-4">
-                <form method="post">
+                <form method="post" id="reporteForm">
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label fw-semibold small text-uppercase text-secondary">Departamento</label>
-                            <select name="departamentoId" class="form-select form-select-sm"
-                                    asp-items="@(ViewBag.Departments as SelectList)">
-                                <option value="">-- Todos --</option>
-                            </select>
+                            @if (filtroAplicado)
+                            {
+                                @Html.DropDownList("departamentoId", (SelectList)ViewBag.Departments, "-- Todos --", new { @class = "form-select form-select-sm filtro-auto" })
+                            }
+                            else
+                            {
+                                @Html.DropDownList("departamentoId", (SelectList)ViewBag.Departments, "-- Seleccione un departamento --", new { @class = "form-select form-select-sm filtro-auto" })
+                            }
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold small text-uppercase text-secondary">Modo</label>
-                            <select name="modo" class="form-select form-select-sm">
-                                <option value="vista">Ver en pantalla</option>
-                                <option value="pdf">Descargar PDF</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                        <a href="javascript:history.back()" class="btn btn-light btn-sm px-4 border text-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-dark btn-sm px-4" style="background-color: #004d26; border: none;">
-                            <i class="bi bi-funnel"></i> Generar
-                        </button>
                     </div>
                 </form>
 
                 @if (Model != null && Model.Any())
                 {
-                    var deptNames = (Dictionary<int, string>)ViewBag.DepartmentNames;
+                    var deptNames = ViewBag.DepartmentNames as Dictionary<int, string>;
                     <div class="table-responsive mt-4">
                         <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
                             <thead class="table-light">
@@ -75,15 +66,33 @@
                                         <td>@b.NumeroIdentificacion</td>
                                         <td>@b.Nombre</td>
                                         <td>@b.Marca</td>
-                                        <td>@deptNames[b.DependenciaID]</td>
+                                        <td>
+                                            @if (deptNames != null && deptNames.ContainsKey(b.DependenciaID))
+                                            {
+                                                @deptNames[b.DependenciaID]
+                                            }
+                                            else
+                                            {
+                                                @($"Dept. {b.DependenciaID}")
+                                            }
+                                        </td>
                                         <td>@b.ValorUnitario.ToString("C")</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
+
+                    <form method="post" class="mt-4 text-end">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="departamentoId" value="@ViewBag.DepartamentoId" />
+                        <input type="hidden" name="modo" value="pdf" />
+                        <button type="submit" class="btn btn-dark btn-sm px-4" style="background-color: #004d26; border: none;">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Descargar PDF
+                        </button>
+                    </form>
                 }
-                else
+                else if (filtroAplicado)
                 {
                     <p class="mt-4 text-muted text-center py-3">No se encontraron bienes con los filtros seleccionados.</p>
                 }
@@ -97,5 +106,15 @@
             box-shadow: 0 0 0 0.2rem rgba(0, 77, 38, 0.1);
         }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.filtro-auto').forEach(el => {
+                el.addEventListener('change', function() {
+                    document.getElementById('reporteForm').submit();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

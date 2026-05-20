@@ -8,47 +8,125 @@
     <title>@ViewData["Title"] - Gestión de Bienes</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #004d26 !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .navbar-brand img {
+                height: 40px;
+            }
+
+        .nav-link {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #333 !important;
+            padding: 0.5rem 1rem !important;
+        }
+
+            .nav-link:hover {
+                color: #004d26 !important;
+            }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .dropdown-item {
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f0f4f8;
+                color: #004d26;
+            }
+
+        .navbar-text {
+            font-size: 0.85rem;
+        }
+
+        .btn-link.nav-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #e31e24 !important;
+        }
+
+            .btn-link.nav-link:hover {
+                color: #c82333 !important;
+            }
+
+        footer {
+            background-color: #fff;
+            border-top: 1px solid #dee2e6;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg bg-white">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Gestión de Bienes</a>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <img src="~/imagenes/logo.jpg" alt="Logo" />
+                    Gestión de Bienes
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse" id="navbarNav">
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Inicio</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Bienes" asp-action="Index">Gestionar Bienes</a>
+                                <a class="nav-link" asp-controller="Bienes" asp-action="Index">Gestionar Bienes</a>
                             </li>
                             @if (User.HasClaim("Permiso", "Admin.Departamentos"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Department" asp-action="Index">Departamentos</a>
+                                    <a class="nav-link" asp-controller="Department" asp-action="Index">Departamentos</a>
                                 </li>
                             }
                             @if (User.HasClaim("Permiso", "Movimientos.SolicitarTraspaso"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Movements" asp-action="SolicitarTraspaso">Solicitar Traspaso</a>
+                                    <a class="nav-link" asp-controller="Movements" asp-action="SolicitarTraspaso">Solicitar Traspaso</a>
                                 </li>
                             }
                             @if (User.HasClaim("Permiso", "Bienes.Desincorporar"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Movements" asp-action="SolicitarDesincorporacion">Solicitar Desincorporación</a>
+                                    <a class="nav-link" asp-controller="Movements" asp-action="SolicitarDesincorporacion">Solicitar Desincorporación</a>
                                 </li>
                             }
                             @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso") || User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion") || User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
                             {
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">Aprobar</a>
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Aprobar</a>
                                     <ul class="dropdown-menu">
                                         @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso"))
                                         {
@@ -68,13 +146,13 @@
                             @if (User.HasClaim("Permiso", "Historial.VerPropios") || User.HasClaim("Permiso", "Historial.VerTodos"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Movements" asp-action="HistorialTraspasos">Historial de Traspasos</a>
+                                    <a class="nav-link" asp-controller="Movements" asp-action="HistorialTraspasos">Historial de Traspasos</a>
                                 </li>
                             }
                             @if (User.HasClaim("Permiso", "Admin.Usuarios"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Admin</a>
+                                    <a class="nav-link" asp-controller="Admin" asp-action="Index">Admin</a>
                                 </li>
                             }
                         }
@@ -83,22 +161,16 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <span class="navbar-text text-dark me-3">Hola, @User.Identity.Name</span>
+                                <span class="navbar-text me-3">Hola, @User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="ChangePassword">Cambiar contraseña</a>
+                                <a class="nav-link" asp-controller="Account" asp-action="ChangePassword">Cambiar contraseña</a>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-link nav-link text-dark">Cerrar sesión</button>
+                                    <button type="submit" class="btn-link nav-link">Cerrar sesión</button>
                                 </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
                             </li>
                         }
                     </ul>
@@ -111,8 +183,8 @@
             @RenderBody()
         </main>
     </div>
-    <footer class="border-top footer text-muted">
-        <div class="container">
+    <footer>
+        <div class="container text-center">
             &copy; @DateTime.Now.Year - Gestión de Bienes
         </div>
     </footer>

@@ -21,7 +21,6 @@ namespace ETPro.Controllers
             _pdfService = pdfService;
         }
 
-        // ─── INVENTARIO POR DEPARTAMENTO ────────────────────────
         [HttpGet]
         [PermissionAuthorize("Reportes.VerPropios")]
         public IActionResult InventarioPorDepartamento()
@@ -36,30 +35,38 @@ namespace ETPro.Controllers
         public async Task<IActionResult> InventarioPorDepartamento(int? departamentoId, string modo = "vista")
         {
             var query = _context.Bienes.Where(b => b.Activo && b.Aprobado);
+            var deptClaim = User.FindFirst("DepartmentId")?.Value;
+            List<int> deptosVisibles = new List<int>();
 
             if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
             {
-                var deptClaim = User.FindFirst("DepartmentId")?.Value;
-                if (int.TryParse(deptClaim, out int userDept))
-                    query = query.Where(b => b.DependenciaID == userDept);
+                deptosVisibles = await ObtenerDepartamentosVisiblesIdsAsync(deptClaim);
+                if (deptosVisibles.Any())
+                    query = query.Where(b => deptosVisibles.Contains(b.DependenciaID));
                 else
                     query = query.Where(b => false);
             }
-            else if (departamentoId.HasValue)
+            else
             {
-                query = query.Where(b => b.DependenciaID == departamentoId.Value);
+                deptosVisibles = await _context.Departments.Select(d => d.ID).ToListAsync();
+                if (departamentoId.HasValue && deptosVisibles.Contains(departamentoId.Value))
+                    query = query.Where(b => b.DependenciaID == departamentoId.Value);
             }
 
             var bienes = await query.OrderBy(b => b.NumeroIdentificacion).ToListAsync();
 
+            ViewBag.DepartamentoId = departamentoId;
+            ViewBag.Modo = modo;
+
             ViewBag.Departments = new SelectList(_context.Departments, "ID", "Name", departamentoId);
             ViewBag.DepartmentNames = await _context.Departments.ToDictionaryAsync(d => d.ID, d => d.Name);
-            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "logo.jpg");
-            ViewBag.LogoPath = "file:///" + logoPath.Replace("\\", "/");
+            ViewBag.LogoPath = ObtenerRutaLogo();
+            ViewBag.LogoTrujilloPath = ObtenerRutaLogoTrujillo();
+            ViewBag.FiltroAplicado = true;
 
             if (modo == "pdf")
             {
-                string html = await RenderViewToString("_ReporteInventarioPDF", bienes);
+                string html = await RenderViewToString("_ReporteBM1PDF", bienes);
                 var pdfBytes = _pdfService.GeneratePdf(html);
                 return File(pdfBytes, "application/pdf", "inventario.pdf");
             }
@@ -67,12 +74,10 @@ namespace ETPro.Controllers
             return View(bienes);
         }
 
-        // ─── MOVIMIENTOS ─────────────────────────────────────────
         [HttpGet]
         [PermissionAuthorize("Reportes.VerPropios")]
         public IActionResult Movimientos()
         {
-            // Construir lista de tipos con Id (valor numérico) y Name (texto)
             var tipos = Enum.GetValues(typeof(MovementType))
                             .Cast<MovementType>()
                             .Select(v => new { Id = (int)v, Name = v.ToString() })
@@ -97,42 +102,52 @@ namespace ETPro.Controllers
             if (!User.HasClaim("Permiso", "Historial.VerTodos"))
             {
                 var deptClaim = User.FindFirst("DepartmentId")?.Value;
-                if (int.TryParse(deptClaim, out int userDept))
-                    query = query.Where(m => m.Bien.DependenciaID == userDept);
+                var deptosVisibles = await ObtenerDepartamentosVisiblesIdsAsync(deptClaim);
+                if (deptosVisibles.Any())
+                    query = query.Where(m => deptosVisibles.Contains(m.Bien.DependenciaID));
                 else
                     query = query.Where(m => false);
             }
 
             if (tipo.HasValue)
                 query = query.Where(m => m.Type == tipo.Value);
-
             if (desde.HasValue)
                 query = query.Where(m => m.FechaSolicitud >= desde.Value);
-
             if (hasta.HasValue)
             {
-                // Incluir todo el día seleccionado
                 DateTime fechaHastaAjustada = hasta.Value.Date.AddDays(1).AddSeconds(-1);
                 query = query.Where(m => m.FechaSolicitud <= fechaHastaAjustada);
             }
 
             var movimientos = await query.OrderByDescending(m => m.FechaSolicitud).ToListAsync();
-            System.Diagnostics.Debug.WriteLine($"Movimientos tras filtros: {movimientos.Count}");
 
-            // Selección de tipos para el dropdown (lo mismo que antes)
+            ViewBag.Tipo = tipo;
+            ViewBag.Desde = desde;
+            ViewBag.Hasta = hasta;
+            ViewBag.Modo = modo;
+
             var tipos = Enum.GetValues(typeof(MovementType))
                             .Cast<MovementType>()
                             .Select(v => new { Id = (int)v, Name = v.ToString() })
                             .ToList();
             ViewBag.Tipos = new SelectList(tipos, "Id", "Name", tipo.HasValue ? (int)tipo.Value : (int?)null);
-
-            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "logo.jpg");
-            ViewBag.LogoPath = "file:///" + logoPath.Replace("\\", "/");  
-
+            ViewBag.LogoPath = ObtenerRutaLogo();
+            ViewBag.LogoTrujilloPath = ObtenerRutaLogoTrujillo();
+            ViewBag.FiltroAplicado = true;
             if (modo == "pdf")
             {
-                var modelo = new ReporteMovimientosViewModel { Movimientos = movimientos };
-                string html = await RenderViewToString("_ReporteMovimientosPDF", modelo);
+
+                var incorporaciones = movimientos.Where(m => m.Type == MovementType.Incorporacion).ToList();
+                var desincorporaciones = movimientos.Where(m => m.Type == MovementType.Desincorporacion).ToList();
+
+                var modelo = new ReporteBM2ViewModel
+                {
+                    Mes = desde.HasValue ? desde.Value.ToString("MM/yyyy") : DateTime.Now.ToString("MM/yyyy"),
+                    Incorporaciones = incorporaciones,
+                    Desincorporaciones = desincorporaciones
+                };
+
+                string html = await RenderViewToString("_ReporteBM2PDF", modelo);
                 var pdfBytes = _pdfService.GeneratePdf(html);
                 return File(pdfBytes, "application/pdf", "movimientos.pdf");
             }
@@ -140,7 +155,6 @@ namespace ETPro.Controllers
             return View(movimientos);
         }
 
-        // ─── BIENES DESINCORPORADOS ──────────────────────────────
         [HttpGet]
         [PermissionAuthorize("Reportes.VerPropios")]
         public IActionResult BienesDesincorporados()
@@ -158,16 +172,22 @@ namespace ETPro.Controllers
             if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
             {
                 var deptClaim = User.FindFirst("DepartmentId")?.Value;
-                if (int.TryParse(deptClaim, out int userDept))
-                    query = query.Where(b => b.DependenciaID == userDept);
+                var deptosVisibles = await ObtenerDepartamentosVisiblesIdsAsync(deptClaim);
+                if (deptosVisibles.Any())
+                    query = query.Where(b => deptosVisibles.Contains(b.DependenciaID));
                 else
                     query = query.Where(b => false);
             }
 
             var bienes = await query.OrderByDescending(b => b.ID).ToListAsync();
+
+            ViewBag.Desde = desde;
+            ViewBag.Hasta = hasta;
+            ViewBag.Modo = modo;
             ViewBag.DepartmentNames = await _context.Departments.ToDictionaryAsync(d => d.ID, d => d.Name);
-            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "logo.jpg");
-            ViewBag.LogoPath = "file:///" + logoPath.Replace("\\", "/");
+            ViewBag.LogoPath = ObtenerRutaLogo();
+            ViewBag.LogoTrujilloPath = ObtenerRutaLogoTrujillo();
+
 
             if (modo == "pdf")
             {
@@ -180,7 +200,6 @@ namespace ETPro.Controllers
             return View(bienes);
         }
 
-        // ─── ESTADO DEL INVENTARIO (RESUMEN) ─────────────────────
         [HttpGet]
         [PermissionAuthorize("Reportes.VerPropios")]
         public async Task<IActionResult> EstadoInventario()
@@ -194,13 +213,12 @@ namespace ETPro.Controllers
         public async Task<IActionResult> EstadoInventario(string modo = "vista")
         {
             var modelo = await CalcularEstadoInventario();
-
-            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "logo.jpg");
-            ViewBag.LogoPath = "file:///" + logoPath.Replace("\\", "/");
+            ViewBag.LogoPath = ObtenerRutaLogo();
+            ViewBag.LogoTrujilloPath = ObtenerRutaLogoTrujillo();
 
             if (modo == "pdf")
             {
-                string html = await RenderViewToString("_ReporteEstadoPDF", modelo);
+                string html = await RenderViewToString("_ReporteBM4PDF", modelo);
                 var pdfBytes = _pdfService.GeneratePdf(html);
                 return File(pdfBytes, "application/pdf", "estado_inventario.pdf");
             }
@@ -215,8 +233,9 @@ namespace ETPro.Controllers
 
             if (!User.HasClaim("Permiso", "Bienes.VerTodos"))
             {
-                if (int.TryParse(deptClaim, out int deptId))
-                    bienesVisibles = bienesVisibles.Where(b => b.DependenciaID == deptId);
+                var deptosVisiblesIds = await ObtenerDepartamentosVisiblesIdsAsync(deptClaim);
+                if (deptosVisiblesIds.Any())
+                    bienesVisibles = bienesVisibles.Where(b => deptosVisiblesIds.Contains(b.DependenciaID));
                 else
                     bienesVisibles = bienesVisibles.Where(b => false);
             }
@@ -235,7 +254,6 @@ namespace ETPro.Controllers
             };
         }
 
-        // ─── HELPER PARA RENDERIZAR VISTAS A STRING ──────────────
         private async Task<string> RenderViewToString(string viewName, object model)
         {
             ViewData.Model = model;
@@ -259,6 +277,30 @@ namespace ETPro.Controllers
 
             await viewResult.View.RenderAsync(viewContext);
             return writer.ToString();
+        }
+
+        private string ObtenerRutaLogo()
+        {
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "logo.jpg");
+            return "file:///" + logoPath.Replace("\\", "/");
+        }
+
+        private string ObtenerRutaLogoTrujillo()
+        {
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "trujillo.png");
+            return "file:///" + logoPath.Replace("\\", "/");
+        }
+
+        private async Task<List<int>> ObtenerDepartamentosVisiblesIdsAsync(string deptClaim)
+        {
+            if (int.TryParse(deptClaim, out int deptId))
+            {
+                return await _context.Departments
+                    .Where(d => d.ID == deptId || d.ParentDepartmentID == deptId)
+                    .Select(d => d.ID)
+                    .ToListAsync();
+            }
+            return new List<int>();
         }
     }
 }

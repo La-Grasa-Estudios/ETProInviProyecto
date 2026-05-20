@@ -1,0 +1,152 @@
+﻿@using EtPro.Models
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+@model List<EtiquetaViewModel>
+@{
+    var logoPath = System.IO.Path.Combine(Env.WebRootPath, "imagenes", "logo.jpg");
+    string base64Logo = "";
+    if (System.IO.File.Exists(logoPath))
+    {
+        byte[] imageArray = System.IO.File.ReadAllBytes(logoPath);
+        base64Logo = "data:image/jpeg;base64," + Convert.ToBase64String(imageArray);
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Etiquetas</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: white;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            width: 350px;
+            border: 1.5px dashed #000;
+            padding: 6px; /* Espacio externo reducido */
+            margin: 5px;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+            text-align: center;
+        }
+
+        .header {
+            display: table;
+            width: 100%;
+            margin-bottom: 3px; /* Espacio reducido */
+        }
+
+        .logo-container {
+            display: table-cell;
+            vertical-align: middle;
+            width: 60px;
+        }
+
+        .logo {
+            width: 55px;
+            height: auto;
+        }
+
+        .empresa-nombre {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 9px;
+            font-weight: bold;
+            line-height: 1.1;
+            padding-left: 5px;
+            text-transform: uppercase;
+        }
+
+        .caja-tecnica {
+            border: 2px solid #000;
+            width: 100%;
+            margin: 3px 0; /* Espacio reducido */
+        }
+
+        .caja-header {
+            border-bottom: 1px solid #000;
+            display: table;
+            width: 100%;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+            .caja-header div {
+                display: table-cell;
+                padding: 2px 0; /* Espacio reducido */
+                border-right: 1px solid #000;
+            }
+
+                .caja-header div:last-child {
+                    border-right: none;
+                }
+
+        .qr-section {
+            padding: 2px 0; /* Espacio entre el borde de la caja y el QR casi al mínimo */
+        }
+
+        .qr-img {
+            width: 200px;
+            height: 200px;
+            image-rendering: pixelated;
+        }
+
+        .bienes-label {
+            border-top: 1px solid #000;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 1px 0; /* Espacio reducido */
+            letter-spacing: 2px;
+        }
+
+        .footer-info {
+            margin-top: 4px; /* Espacio reducido */
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .clear {
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    @foreach (var etiqueta in Model)
+    {
+        <div class="etiqueta">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="@base64Logo" class="logo" alt="Logo" />
+                </div>
+                <div class="empresa-nombre">
+                    EMPRESA TRUJILLANA DE<br />
+                    PROYECTOS, INFRAESTRUCTURA Y<br />
+                    VIVIENDA S.A
+                </div>
+            </div>
+
+            <div class="caja-tecnica">
+                <div class="caja-header">
+                    <div>G: @etiqueta.Grupo</div>
+                    <div>SG: @etiqueta.Subgrupo</div>
+                    <div>COD: @etiqueta.Codigo</div>
+                </div>
+                <div class="qr-section">
+                    <img src="data:image/png;base64,@etiqueta.QrBase64" class="qr-img" alt="QR" />
+                </div>
+                <div class="bienes-label">BIENES</div>
+            </div>
+
+            <div class="footer-info">
+                @etiqueta.Descripcion | @etiqueta.Anio
+            </div>
+        </div>
+    }
+</body>
+</html>

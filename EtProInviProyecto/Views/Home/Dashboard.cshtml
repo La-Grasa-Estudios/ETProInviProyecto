@@ -1,14 +1,14 @@
 ﻿@model EtProInviProyecto.Models.BienesRegistradosViewModel;
 @{
     Layout = "_AdminLayout";
-    ViewData["PageName"] = "Inicio"; 
+    ViewData["PageName"] = "Inicio";
     ViewData["PageDescription"] = "Resumen general del inventario";
 }
 <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 
 <div class="dashboard-container">
-    <div class="info-container">
 
+    <div class="info-container">
         <div class="dashboard-info" style="background-color: green;">
             <div class="dashboard-icon">
                 <div class="dashboard-icon-bg"></div>
@@ -28,6 +28,7 @@
                 <h6>Todos los bienes registrados</h6>
             </div>
         </div>
+
         <div class="dashboard-info" style="background-color: white; color: black;">
             <div class="dashboard-icon">
                 <div class="dashboard-icon-bg" style="background-color: lightgray;"></div>
@@ -38,6 +39,7 @@
                 <h6>En operación</h6>
             </div>
         </div>
+
         <div class="dashboard-info" style="background-color: orange;">
             <div class="dashboard-icon">
                 <div class="dashboard-icon-bg"></div>
@@ -48,6 +50,7 @@
                 <h6>Movimientos registrados</h6>
             </div>
         </div>
+
         <div class="dashboard-info" style="background-color: red;">
             <div class="dashboard-icon">
                 <div class="dashboard-icon-bg"></div>
@@ -59,7 +62,6 @@
             </div>
         </div>
 
-        <!-- Tarjeta de Solicitudes Pendientes (solo si tiene permisos de aprobación) -->
         @if (User.HasClaim("Permiso", "Movimientos.AprobarTraspaso") ||
                 User.HasClaim("Permiso", "Movimientos.AprobarDesincorporacion") ||
                 User.HasClaim("Permiso", "Movimientos.AprobarIncorporacion"))
@@ -103,9 +105,11 @@
                 </div>
             </div>
         }
+    </div>
 
-        <!-- Gráfico de estado del inventario (existente) -->
-        <div class="graph-container">
+    <div class="dashboard-bottom-section" style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 30px; width: 100%;">
+
+        <div class="graph-container" style="flex: 1; min-width: 300px;">
             <div class="graph-header">
                 <span><b>Estado del Inventario</b></span>
             </div>
@@ -137,15 +141,14 @@
             </div>
         </div>
 
-        <!-- Movimientos Recientes (si existen) -->
         @if (Model.MovimientosRecientes != null && Model.MovimientosRecientes.Any())
         {
-            <div class="graph-container" style="margin-top: 20px;">
+            <div class="graph-container" style="flex: 2; min-width: 400px;">
                 <div class="graph-header">
                     <span><b>Últimos Movimientos</b></span>
                 </div>
-                <div class="card-body">
-                    <table class="custom-inventory-table">
+                <div class="card-body" style="overflow-x: auto;">
+                    <table class="custom-inventory-table" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -173,7 +176,7 @@
         }
         else
         {
-            <div class="graph-container" style="margin-top: 20px;">
+            <div class="graph-container" style="flex: 2; min-width: 400px;">
                 <div class="graph-header">
                     <span><b>Últimos Movimientos</b></span>
                 </div>
@@ -184,6 +187,7 @@
         }
 
     </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

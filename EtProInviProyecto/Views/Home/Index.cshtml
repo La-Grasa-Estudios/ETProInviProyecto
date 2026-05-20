@@ -1,12 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Página principal";
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+@{
+    ViewData["Title"] = "Bienvenido";
+    Layout = "_Layout";
 }
-<h1>Bienvenido al Sistema de Gestión de Bienes</h1>
-@if (User.Identity.IsAuthenticated)
-{
-    <p>Hola, @User.Identity.Name.</p>
-}
-else
-{
-    <p>No has iniciado sesión.</p>
-}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <img src="~/imagenes/logo.jpg" alt="Logo" style="height: 100px; margin-bottom: 20px;" />
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 pt-4">
+                    <div class="d-flex align-items-center">
+                        <div style="width: 4px; height: 24px; background-color: #e31e24; margin-right: 10px;"></div>
+                        <h4 class="mb-0 text-dark fw-bold">Sistema de Gestión de Bienes</h4>
+                    </div>
+                    <hr class="mt-3 mb-0" style="opacity: 0.1;">
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted">Administración y control de bienes muebles institucionales.</p>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-dark px-4" style="background-color: #004d26; border: none;">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

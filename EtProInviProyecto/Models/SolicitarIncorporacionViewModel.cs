@@ -26,6 +26,10 @@ namespace EtPro.Models
         [MaxLength(10)]
         public string? Seccion { get; set; }
 
+        [Required(ErrorMessage = "El origen es obligatorio")]
+        [MaxLength(50)]
+        public string Origen { get; set; }
+
         public int Grupo { get; set; } = 2;
 
         [Required(ErrorMessage = "Debe seleccionar un departamento")]

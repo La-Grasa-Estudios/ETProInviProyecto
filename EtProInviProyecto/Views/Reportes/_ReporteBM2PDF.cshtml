@@ -1,0 +1,278 @@
+﻿@using EtPro.Models;
+@model EtPro.Models.ReporteBM2ViewModel
+@{
+    var logoPath = ViewBag.LogoPath as string;
+    var logoTrujilloPath = ViewBag.LogoTrujilloPath as string;
+    var fecha = DateTime.Now.ToString("dd/MM/yyyy");
+
+    var movimientos = new List<dynamic>();
+    
+    if (Model.Incorporaciones != null)
+    {
+        foreach (var m in Model.Incorporaciones)
+        {
+            movimientos.Add(new
+            {
+                Grupo = m.Bien?.Grupo,
+                Subgrupo = m.Bien?.Subgrupo,
+                Seccion = m.Bien?.Seccion,
+                Concepto = "INCORPORACIÓN",
+                NumeroIdentificacion = m.Bien?.NumeroIdentificacion,
+                Nombre = m.Bien?.Nombre,
+                ValorInc = m.Bien?.ValorUnitario ?? 0m,
+                ValorDes = 0m
+            });
+        }
+    }
+
+    if (Model.Desincorporaciones != null)
+    {
+        foreach (var m in Model.Desincorporaciones)
+        {
+            movimientos.Add(new
+            {
+                Grupo = m.Bien?.Grupo,
+                Subgrupo = m.Bien?.Subgrupo,
+                Seccion = m.Bien?.Seccion,
+                Concepto = m.Motivo ?? "DESINCORPORACIÓN",
+                NumeroIdentificacion = m.Bien?.NumeroIdentificacion,
+                Nombre = m.Bien?.Nombre,
+                ValorInc = 0m,
+                ValorDes = m.Bien?.ValorUnitario ?? 0m
+            });
+        }
+    }
+
+    decimal totalInc = movimientos.Sum(x => (decimal)x.ValorInc);
+    decimal totalDes = movimientos.Sum(x => (decimal)x.ValorDes);
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>BM-2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px; 
+            color: #000;
+            margin: 15px;
+            text-transform: uppercase;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .bg-gray {
+            background-color: #d9d9d9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        .table-main, .table-main th, .table-main td {
+            border: 1px solid #000;
+        }
+
+        .table-main {
+            border: 2px solid #000;
+            margin-bottom: 5px;
+        }
+
+            .table-main th, .table-main td {
+                padding: 4px;
+                vertical-align: middle;
+                height: 18px; 
+            }
+
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+            margin: auto;
+        }
+
+        .info-box {
+            border: 2px solid #000;
+            background-color: #d9d9d9; 
+            margin-bottom: 0px;
+        }
+
+            .info-box td {
+                padding: 6px;
+                vertical-align: top;
+                font-size: 10px;
+                font-weight: bold;
+                border: none;
+            }
+
+        .header-table td {
+            border: none;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <table class="header-table" style="margin-bottom: 5px;">
+        <tr>
+            <td style="width: 25%; text-align: left;">
+                <img src="@logoPath" alt="ETPROINVI" style="height: 60px;" />
+            </td>
+            <td style="width: 50%; text-align: center; font-size: 11px; font-weight: bold; line-height: 1.2;">
+                REPÚBLICA BOLIVARIANA DE VENEZUELA<br />
+                EMPRESA TRUJILLANA DE PROYECTOS, INFRAESTRUCTURA Y VIVIENDA, S.A.<br />
+                ETPROINVI, S.A.
+            </td>
+            <td style="width: 25%; text-align: right;">
+                <img src="@logoTrujilloPath" alt="Gobierno de Trujillo" style="height: 60px;" />
+            </td>
+        </tr>
+    </table>
+
+    <table style="margin-bottom: 5px;">
+        <tr>
+            <td style="text-align: right; font-weight: bold; font-size: 11px;">
+                FORMULARIO BM-2<br />
+                PÁG. 01/01
+            </td>
+        </tr>
+    </table>
+
+    <table style="border: 2px solid #000; margin-bottom: 5px;">
+        <tr>
+            <td class="bg-gray text-center bold" style="font-size: 11px; padding: 4px;">
+                RELACIÓN DEL MOVIMIENTO DE BIENES MUEBLES
+            </td>
+        </tr>
+    </table>
+
+    <table class="info-box">
+        <tr>
+            <td style="width: 50%;">
+                1. ENTIDAD PROPIETARIO: ETPROINVI<br /><br />
+                3. UNIDAD DE TRABAJO O DEPENDENCIA: ANDINEX<br /><br />
+                5. MUNICIPIO: VALERA<br /><br />
+                7. FECHA: @fecha
+            </td>
+            <td style="width: 50%;">
+                2. UNIDAD DE SERVICIO: ANDINEX<br /><br />
+                4. ESTADO: TRUJILLO<br /><br />
+                6. DIRECCIÓN: AV. BOLÍVAR ENTRE CALLES 25 Y 26, SECTOR LAS ACACIAS, FRENTE A<br />
+                LA U.E "IGNACIO MARTÍN BURK"<br /><br />
+                8. ELABORADO POR:<br />
+                FIRMA: ___________________________________ C.I: ________________
+            </td>
+        </tr>
+    </table>
+
+    <table style="border: 2px solid #000; border-top: none; margin-bottom: 5px;">
+        <tr>
+            <td class="bg-gray text-center bold" style="font-size: 10px; padding: 4px;">
+                EN EL MES DE LA CUENTA HA OCURRIDO EL SIGUIENTE MOVIMIENTO EN LOS BIENES A CARGO DE ESTA DEPENDENCIA:
+            </td>
+        </tr>
+    </table>
+
+    <table class="table-main">
+        <thead>
+            <tr>
+                <th colspan="3" class="bg-gray text-center bold">CLASIFICACIÓN<br />CÓDIGO</th>
+                <th rowspan="2" class="bg-gray bold" style="width: 30px;">
+                    <div class="vertical-text" style="height: 120px;">CONCEPTO DE MOVIMIENTO</div>
+                </th>
+                <th rowspan="2" class="bg-gray bold" style="width: 25px;">
+                    <div class="vertical-text">CANTIDAD</div>
+                </th>
+                <th rowspan="2" class="bg-gray bold" style="width: 50px;">
+                    <div class="vertical-text" style="height: 120px;">N° DE IDENTIFICACIÓN</div>
+                </th>
+                <th rowspan="2" class="bg-gray text-center bold">NOMBRE Y DESCRIPCIÓN DE LOS ELEMENTOS</th>
+                <th rowspan="2" class="bg-gray text-center bold" style="width: 80px;">INCORPORACIONES</th>
+                <th rowspan="2" class="bg-gray text-center bold" style="width: 80px;">DESINCORPORACIONES</th>
+            </tr>
+            <tr>
+                <th class="bg-gray bold" style="width: 20px; height: 120px;"><div class="vertical-text">GRUPO</div></th>
+                <th class="bg-gray bold" style="width: 20px;"><div class="vertical-text">SUB-GRUPO</div></th>
+                <th class="bg-gray bold" style="width: 20px;"><div class="vertical-text">SECCIÓN</div></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowCount = 0;
+                int maxRows = 12; 
+
+                foreach (var m in movimientos)
+                {
+                    rowCount++;
+                    <tr>
+                        <td class="text-center bold">@m.Grupo</td>
+                        <td class="text-center bold">@(string.IsNullOrEmpty(m.Subgrupo) ? "00" : m.Subgrupo)</td>
+                        <td class="text-center bold">@(string.IsNullOrEmpty(m.Seccion) ? "00" : m.Seccion)</td>
+
+                        <td class="text-center bold" style="font-size: 8px;">@m.Concepto</td>
+
+                        <td class="text-center bold">1</td>
+                        <td class="text-center bold">@m.NumeroIdentificacion</td>
+                        <td class="bold">@m.Nombre</td>
+
+                        <td class="text-right bold">@(m.ValorInc > 0 ? m.ValorInc.ToString("N2") : "")</td>
+                        <td class="text-right bold">@(m.ValorDes > 0 ? m.ValorDes.ToString("N2") : "")</td>
+                    </tr>
+                }
+
+                for (int i = rowCount; i < maxRows; i++)
+                {
+                    <tr>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="text-center bold">&nbsp;</td>
+                        <td class="bold">&nbsp;</td>
+                        <td class="text-right bold">&nbsp;</td>
+                        <td class="text-right bold">&nbsp;</td>
+                    </tr>
+                }
+            }
+
+            <tr>
+                <td colspan="7" class="text-right bold">TOTAL BS------------------</td>
+                <td class="text-right bold">@totalInc.ToString("N2")</td>
+                <td class="text-right bold">@totalDes.ToString("N2")</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table style="width: 100%; border: 1px solid #000; font-size: 10px; font-weight: bold; margin-top: 10px;">
+        <tr>
+            <td style="width: 50%; padding: 5px; border-right: 1px solid #000; vertical-align: top;">
+                NOMBRE Y APELLIDO DEL JEFE DE LA UNIDAD:<br />
+                LICDA. RIVAS EMILY<br /><br />
+                C.I.: V.-29.803.103
+            </td>
+            <td style="width: 50%; padding: 5px; vertical-align: bottom;">
+                FIRMA Y SELLO: ___________________________________
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
